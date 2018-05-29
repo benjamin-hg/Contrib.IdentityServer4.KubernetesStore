@@ -1,0 +1,33 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 15
+VisualStudioVersion = 15.0.26430.6
+MinimumVisualStudioVersion = 15.0
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Library", "Library\Library.csproj", "{9A2C4249-6462-4E8C-9B15-3ECFDBD00481}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UnitTests", "UnitTests\UnitTests.csproj", "{E05AD4C5-0D2C-49F9-AB72-480AD91A1CAD}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "_build", "_build", "{383C57F7-3011-4E49-A835-D5934859E0F3}"
+ProjectSection(SolutionItems) = preProject
+	..\appveyor.yml = ..\appveyor.yml
+EndProjectSection
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{9A2C4249-6462-4E8C-9B15-3ECFDBD00481}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9A2C4249-6462-4E8C-9B15-3ECFDBD00481}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9A2C4249-6462-4E8C-9B15-3ECFDBD00481}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9A2C4249-6462-4E8C-9B15-3ECFDBD00481}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E05AD4C5-0D2C-49F9-AB72-480AD91A1CAD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E05AD4C5-0D2C-49F9-AB72-480AD91A1CAD}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E05AD4C5-0D2C-49F9-AB72-480AD91A1CAD}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E05AD4C5-0D2C-49F9-AB72-480AD91A1CAD}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal

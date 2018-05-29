@@ -1,0 +1,83 @@
+apiVersion: apiextensions.k8s.io/v1beta1
+kind: CustomResourceDefinition
+metadata:
+  name: identityclients.stable.contrib.identityserver.io
+spec:
+  group: stable.contrib.identityserver.io
+  version: v1
+  scope: Namespaced
+  names:
+    plural: identityclients
+    singular: identityclients
+    kind: IdentityClient
+    shortNames:
+    - idc
+  subresources:
+    status: {}
+  validation:
+    openAPIV3Schema:
+      required: ['spec']
+      properties:
+        spec:
+          required:
+            - clientId
+            - clientName
+            - allowedGrantTypes
+          properties:
+            enabled:
+              type: boolean
+              default: true
+            clientId:
+              type: string
+            clientSecrets:
+              type: array
+              items:
+                type: string
+            accessTokenType:
+              type: string
+              enum:
+                - 'jwt'
+                - 'reference'
+            clientName:
+              type: string
+            clientUri:
+              type: string
+            logoUri:
+              type: string
+            requireConsent:
+              type: boolean
+              default: true
+            allowAccessTokensViaBrowser:
+              type: boolean
+              default: true
+            alwaysIncludeUserClaimsInIdToken:
+              type: boolean
+              default: false
+            allowedGrantTypes:
+              type: array
+              items:
+                type: string
+            redirectUris:
+              type: array
+              items:
+                type: string
+            postLogoutRedirectUris:
+              type: array
+              items:
+                type: string
+            allowedScopes:
+              type: array
+              items:
+                type: string
+            updateAccessTokenClaimsOnRefresh:
+              type: boolean
+              default: true
+            allowedCorsOrigins:
+              type: array
+              items:
+                type: string
+            claims:
+              type: array
+              items:
+                type: string
+
