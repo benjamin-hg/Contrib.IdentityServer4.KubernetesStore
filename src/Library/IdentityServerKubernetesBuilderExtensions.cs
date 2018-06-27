@@ -37,7 +37,7 @@ namespace Contrib.IdentityServer4.KubernetesStore
         }
 
         private static IServiceCollection AddKubernetesClient(this IServiceCollection services)
-            => services.AddTransient<KubeApiClientFactory>()
+            => services.AddSingleton<KubeApiClientFactory>()
                        .AddSingleton(provider => provider.GetRequiredService<KubeApiClientFactory>().Build())
                        .AddSingleton<ICustomResourceClient, CustomResourceClient>();
 
@@ -47,8 +47,8 @@ namespace Contrib.IdentityServer4.KubernetesStore
                        .AddSingleton<ICustomResourceWatcher<ApiResource>, ApiResourceWatcher>();
 
         private static IServiceCollection AddKubernetesStores(this IServiceCollection services)
-            => services.AddTransient<IClientStore, KubernetesClientStore>()
-                       .AddTransient<IResourceStore, KubernetesResourceStore>()
-                       .AddTransient<ICorsPolicyService, KubernetesCorsPolicyService>();
+            => services.AddSingleton<IClientStore, KubernetesClientStore>()
+                       .AddSingleton<IResourceStore, KubernetesResourceStore>()
+                       .AddSingleton<ICorsPolicyService, KubernetesCorsPolicyService>();
     }
 }
