@@ -1,5 +1,5 @@
 ﻿using System;
-using System.Collections.Concurrent;
+using System.Collections;
 using System.Collections.Generic;
 using System.Threading;
 using KubeClient.Models;
@@ -12,7 +12,7 @@ namespace Contrib.IdentityServer4.KubernetesStore
         private readonly ILogger _logger;
         private readonly ICustomResourceClient _client;
         private readonly string _crdPluralName;
-        private readonly ConcurrentDictionary<string, TSpec> _resources = new ConcurrentDictionary<string, TSpec>();
+        private readonly Dictionary<string, TSpec> _resources = new Dictionary<string, TSpec>();
         private IDisposable _subscription;
 
         protected CustomResourceWatcher(ILogger logger, ICustomResourceClient client, string crdPluralName)
@@ -24,7 +24,7 @@ namespace Contrib.IdentityServer4.KubernetesStore
             Subscribe();
         }
 
-        public IEnumerable<TSpec> Resources => _resources.Values;
+        public IEnumerable<TSpec> Resources => new CrdMemento(_resources);
 
         private void Subscribe()
         {
@@ -39,10 +39,11 @@ namespace Contrib.IdentityServer4.KubernetesStore
             {
                 case ResourceEventType.Added:
                 case ResourceEventType.Modified:
-                    _resources.AddOrUpdate(@event.Resource.GlobalName, @event.Resource.Spec, (_, spec) => @event.Resource.Spec);
+                    _resources[@event.Resource.GlobalName] = @event.Resource.Spec;
                     break;
                 case ResourceEventType.Deleted:
-                    _resources.TryRemove(@event.Resource.GlobalName, out _);
+                    if (_resources.ContainsKey(@event.Resource.GlobalName))
+                        _resources.Remove(@event.Resource.GlobalName);
                     break;
                 case ResourceEventType.Error:
                     break;
@@ -66,5 +67,16 @@ namespace Contrib.IdentityServer4.KubernetesStore
         }
 
         public virtual void Dispose() => DisposeSubscriptions();
+
+        private class CrdMemento : IEnumerable<TSpec>
+        {
+            private readonly Dictionary<string, TSpec> _toIterate;
+
+            public CrdMemento(Dictionary<string, TSpec> toIterate) => _toIterate = toIterate;
+
+            public IEnumerator<TSpec> GetEnumerator() => _toIterate.Values.GetEnumerator();
+
+            IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
+        }
     }
 }

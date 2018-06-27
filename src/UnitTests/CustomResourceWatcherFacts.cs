@@ -49,13 +49,14 @@ namespace Contrib.IdentityServer4.KubernetesStore
         [Fact]
         public void DeletedResourceGetsRemovedFromResources()
         {
+            var watcherResources = _watcher.Resources;
+
             var addedResource = CreateResourceEvent(ResourceEventType.Added, "expectedClientId");
             var removedResource = CreateResourceEvent(ResourceEventType.Deleted, "expectedClientId");
             _resourceSubject.OnNext(addedResource);
-
             _resourceSubject.OnNext(removedResource);
 
-            _watcher.Resources.Should().BeEmpty();
+            watcherResources.Should().BeEmpty();
         }
 
         [Fact]
