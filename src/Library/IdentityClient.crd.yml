@@ -32,7 +32,19 @@ spec:
             clientSecrets:
               type: array
               items:
-                type: string
+                properties:
+                  value:
+                    type: string
+                    format: password
+                  description:
+                    type: string
+                  expiration:
+                    type: string
+                    format: date-time
+                  type:
+                    type: string
+                required:
+                - value
             accessTokenType:
               type: string
               enum:
