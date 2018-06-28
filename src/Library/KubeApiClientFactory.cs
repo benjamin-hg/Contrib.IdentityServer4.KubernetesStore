@@ -21,12 +21,12 @@ namespace Contrib.IdentityServer4.KubernetesStore
             if (string.IsNullOrWhiteSpace(_connectionString))
             {
                 options = KubeClientOptions.FromPodServiceAccount();
-                _logger.LogInformation("Using cluster-internal kubernetes connection.");
+                _logger.LogInformation($"Using cluster-internal kubernetes connection ({options.ApiEndPoint}).");
             }
             else
             {
                 options = new KubeClientOptions(_connectionString);
-                _logger.LogInformation("Using remote kubernetes connection.");
+                _logger.LogInformation($"Using remote kubernetes connection ({options.ApiEndPoint}).");
             }
 
             return KubeApiClient.Create(options);
