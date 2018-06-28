@@ -20,16 +20,23 @@ namespace Contrib.IdentityServer4.KubernetesStore
             _logger = logger;
             _client = client;
             _crdPluralName = crdPluralName;
-
-            Subscribe();
         }
 
         public IEnumerable<TSpec> Resources => new CrdMemento(_resources);
+        public event EventHandler<Exception> OnConnectionError;
+        public event EventHandler OnConnected;
+
+        public void StartWatching()
+        {
+            if (_subscription == null)
+                Subscribe();
+        }
 
         private void Subscribe()
         {
             DisposeSubscriptions();
             _subscription = _client.Watch<TSpec>(_crdPluralName).Subscribe(OnNext, OnError);
+            OnConnected?.Invoke(this, EventArgs.Empty);
             _logger.LogDebug($"Subscribed to {_crdPluralName}.");
         }
 
@@ -56,6 +63,7 @@ namespace Contrib.IdentityServer4.KubernetesStore
         private void OnError(Exception exception)
         {
             _logger.LogError(exception, $"Error occured during watch for custom resource of type {typeof(TSpec).Name}. Resubscribing...");
+            OnConnectionError?.Invoke(this, exception);
             Thread.Sleep(1000);
             Subscribe();
         }
@@ -63,6 +71,7 @@ namespace Contrib.IdentityServer4.KubernetesStore
         private void DisposeSubscriptions()
         {
             _subscription?.Dispose();
+            _subscription = null;
             _logger.LogDebug($"Unsubscribed from {_crdPluralName}.");
         }
 

@@ -9,6 +9,9 @@ namespace Contrib.IdentityServer4.KubernetesStore
     {
         public KubernetesResourceStore(ICustomResourceWatcher<IdentityResource> identityResourceWatcher, ICustomResourceWatcher<ApiResource> apiResourceWatcher)
             : base(identityResourceWatcher.Resources, apiResourceWatcher.Resources)
-        {}
+        {
+            identityResourceWatcher.StartWatching();
+            apiResourceWatcher.StartWatching();
+        }
     }
 }

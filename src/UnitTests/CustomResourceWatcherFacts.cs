@@ -13,18 +13,18 @@ namespace Contrib.IdentityServer4.KubernetesStore
     {
         private readonly TestResourceWatcher _watcher;
         private readonly Subject<IResourceEventV1<CustomResource<Client>>> _resourceSubject;
-        private readonly Mock<ICustomResourceClient> _resourceClientMock;
 
         public CustomResourceWatcherFacts()
         {
             _resourceSubject = new Subject<IResourceEventV1<CustomResource<Client>>>();
-            _resourceClientMock = new Mock<ICustomResourceClient>();
-            _resourceClientMock.Setup(mock => mock.Watch<Client>("identityclients")).Returns(_resourceSubject);
-            _watcher = new TestResourceWatcher(_resourceClientMock.Object);
+            var resourceClientMock = new Mock<ICustomResourceClient>();
+            resourceClientMock.Setup(mock => mock.Watch<Client>("identityclients")).Returns(_resourceSubject);
+            _watcher = new TestResourceWatcher(resourceClientMock.Object);
+            _watcher.StartWatching();
         }
 
         [Fact]
-        public void AddedResourceGetsPopulatedToResources()
+        public void AddedResourceGetsAddedToCache()
         {
             var expectedResource = CreateResourceEvent(ResourceEventType.Added, "expectedClientId");
 
@@ -34,7 +34,7 @@ namespace Contrib.IdentityServer4.KubernetesStore
         }
 
         [Fact]
-        public void ModifiedResourceGetsPopulatedToResources()
+        public void ModifiedResourceGetsUpdatedInCache()
         {
             var addedResource = CreateResourceEvent(ResourceEventType.Added, "expectedClientId");
             var modifiedResource = CreateResourceEvent(ResourceEventType.Modified, "expectedClientId");
@@ -47,7 +47,7 @@ namespace Contrib.IdentityServer4.KubernetesStore
         }
 
         [Fact]
-        public void DeletedResourceGetsRemovedFromResources()
+        public void DeletedResourceGetsRemovedFromCache()
         {
             var watcherResources = _watcher.Resources;
 
@@ -60,6 +60,28 @@ namespace Contrib.IdentityServer4.KubernetesStore
         }
 
         [Fact]
+        public void RaisesOnConnected()
+        {
+            _watcher.OnConnectedTriggered.Should().BeTrue();
+        }
+
+        [Fact]
+        public void RaisesOnConnectionError()
+        {
+            var errorSubject = new Subject<IResourceEventV1<CustomResource<Client>>>();
+            var resourceClientMock = new Mock<ICustomResourceClient>();
+            resourceClientMock.SetupSequence(mock => mock.Watch<Client>(It.IsAny<string>()))
+                              .Returns(errorSubject)
+                              .Returns(new Subject<IResourceEventV1<CustomResource<Client>>>());
+            var watcher = new TestResourceWatcher(resourceClientMock.Object);
+            watcher.StartWatching();
+
+            errorSubject.OnError(new Exception());
+
+            watcher.OnConnectionErrorTriggered.Should().BeTrue();
+        }
+
+        [Fact]
         public void ResubscribesOnError()
         {
             var errorSubject = new Subject<IResourceEventV1<CustomResource<Client>>>();
@@ -67,7 +89,8 @@ namespace Contrib.IdentityServer4.KubernetesStore
             resourceClientMock.SetupSequence(mock => mock.Watch<Client>(It.IsAny<string>()))
                               .Returns(errorSubject)
                               .Returns(new Subject<IResourceEventV1<CustomResource<Client>>>());
-            var _ = new TestResourceWatcher(resourceClientMock.Object);
+            var watcher = new TestResourceWatcher(resourceClientMock.Object);
+            watcher.StartWatching();
 
             errorSubject.OnError(new Exception());
 
@@ -93,7 +116,13 @@ namespace Contrib.IdentityServer4.KubernetesStore
         {
             public TestResourceWatcher(ICustomResourceClient client)
                 : base(new Logger<CustomResourceWatcher<Client>>(new LoggerFactory()), client, "identityclients")
-            {}
+            {
+                OnConnected += (sender, args) => OnConnectedTriggered = true;
+                OnConnectionError += (sender, args) => OnConnectionErrorTriggered = true;
+            }
+
+            public bool OnConnectedTriggered { get; private set; }
+            public bool OnConnectionErrorTriggered { get; private set; }
         }
     }
 }

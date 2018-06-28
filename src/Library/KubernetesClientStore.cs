@@ -9,6 +9,8 @@ namespace Contrib.IdentityServer4.KubernetesStore
     {
         public KubernetesClientStore(ICustomResourceWatcher<Client> clientWatcher)
             : base(clientWatcher.Resources)
-        {}
+        {
+            clientWatcher.StartWatching();
+        }
     }
 }

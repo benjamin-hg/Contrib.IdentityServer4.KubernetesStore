@@ -10,6 +10,8 @@ namespace Contrib.IdentityServer4.KubernetesStore
     {
         public KubernetesCorsPolicyService(ILogger<KubernetesCorsPolicyService> logger, ICustomResourceWatcher<Client> clientWatcher)
             : base(logger, clientWatcher.Resources)
-        {}
+        {
+            clientWatcher.StartWatching();
+        }
     }
 }
