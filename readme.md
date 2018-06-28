@@ -1,4 +1,7 @@
+
 # Contrib.IdentityServer4.KubernetesStore
+
+![](https://ci.appveyor.com/api/projects/status/8gotth3a2mh95ybs?svg=true)
 
 This repository contains the source code for Contrib.IdentityServer4.KubernetesStore.
 
