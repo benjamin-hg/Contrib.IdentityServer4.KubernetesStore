@@ -13,13 +13,16 @@ namespace Contrib.IdentityServer4.KubernetesStore
     {
         private readonly TestResourceWatcher _watcher;
         private readonly Subject<IResourceEventV1<CustomResource<Client>>> _resourceSubject;
+        private Mock<ICustomResourceClient> _resourceClientMock;
 
         public CustomResourceWatcherFacts()
         {
             _resourceSubject = new Subject<IResourceEventV1<CustomResource<Client>>>();
-            var resourceClientMock = new Mock<ICustomResourceClient>();
-            resourceClientMock.Setup(mock => mock.Watch<Client>("identityclients")).Returns(_resourceSubject);
-            _watcher = new TestResourceWatcher(resourceClientMock.Object);
+            _resourceClientMock = new Mock<ICustomResourceClient>();
+            _resourceClientMock.SetupSequence(mock => mock.Watch<Client>(It.IsAny<string>()))
+                              .Returns(_resourceSubject)
+                              .Returns(new Subject<IResourceEventV1<CustomResource<Client>>>());
+            _watcher = new TestResourceWatcher(_resourceClientMock.Object);
             _watcher.StartWatching();
         }
 
@@ -68,33 +71,42 @@ namespace Contrib.IdentityServer4.KubernetesStore
         [Fact]
         public void RaisesOnConnectionError()
         {
-            var errorSubject = new Subject<IResourceEventV1<CustomResource<Client>>>();
-            var resourceClientMock = new Mock<ICustomResourceClient>();
-            resourceClientMock.SetupSequence(mock => mock.Watch<Client>(It.IsAny<string>()))
-                              .Returns(errorSubject)
-                              .Returns(new Subject<IResourceEventV1<CustomResource<Client>>>());
-            var watcher = new TestResourceWatcher(resourceClientMock.Object);
-            watcher.StartWatching();
+            _watcher.StartWatching();
 
-            errorSubject.OnError(new Exception());
+            _resourceSubject.OnError(new Exception());
 
-            watcher.OnConnectionErrorTriggered.Should().BeTrue();
+            _watcher.OnConnectionErrorTriggered.Should().BeTrue();
         }
 
         [Fact]
         public void ResubscribesOnError()
         {
-            var errorSubject = new Subject<IResourceEventV1<CustomResource<Client>>>();
-            var resourceClientMock = new Mock<ICustomResourceClient>();
-            resourceClientMock.SetupSequence(mock => mock.Watch<Client>(It.IsAny<string>()))
-                              .Returns(errorSubject)
-                              .Returns(new Subject<IResourceEventV1<CustomResource<Client>>>());
-            var watcher = new TestResourceWatcher(resourceClientMock.Object);
-            watcher.StartWatching();
+            _watcher.StartWatching();
 
-            errorSubject.OnError(new Exception());
+            _resourceSubject.OnError(new Exception());
 
-            resourceClientMock.Verify(mock => mock.Watch<Client>(It.IsAny<string>()), Times.Exactly(2));
+            _resourceClientMock.Verify(mock => mock.Watch<Client>(It.IsAny<string>()), Times.Exactly(2));
+        }
+
+        [Fact]
+        public void ResubscribesOnCompletion()
+        {
+            _watcher.StartWatching();
+
+            _resourceSubject.OnCompleted();
+
+            _resourceClientMock.Verify(mock => mock.Watch<Client>(It.IsAny<string>()), Times.Exactly(2));
+        }
+
+        [Fact]
+        public void DoesNotResubscribeAfterDisposal()
+        {
+            _watcher.StartWatching();
+
+            _watcher.Dispose();
+            _resourceSubject.OnCompleted();
+
+            _resourceClientMock.Verify(mock => mock.Watch<Client>(It.IsAny<string>()), Times.Exactly(1));
         }
 
         private static ResourceEventV1<CustomResource<Client>> CreateResourceEvent(ResourceEventType eventType, string clientId)

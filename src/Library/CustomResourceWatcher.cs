@@ -9,10 +9,11 @@ namespace Contrib.IdentityServer4.KubernetesStore
 {
     public abstract class CustomResourceWatcher<TSpec> : ICustomResourceWatcher<TSpec>, IDisposable
     {
+        private readonly Dictionary<string, TSpec> _resources = new Dictionary<string, TSpec>();
+        private readonly CancellationTokenSource _cancellationTokenSource = new CancellationTokenSource();
         private readonly ILogger _logger;
         private readonly ICustomResourceClient _client;
         private readonly string _crdPluralName;
-        private readonly Dictionary<string, TSpec> _resources = new Dictionary<string, TSpec>();
         private IDisposable _subscription;
 
         protected CustomResourceWatcher(ILogger logger, ICustomResourceClient client, string crdPluralName)
@@ -34,8 +35,11 @@ namespace Contrib.IdentityServer4.KubernetesStore
 
         private void Subscribe()
         {
+            if (_cancellationTokenSource.IsCancellationRequested)
+                return;
+
             DisposeSubscriptions();
-            _subscription = _client.Watch<TSpec>(_crdPluralName).Subscribe(OnNext, OnError);
+            _subscription = _client.Watch<TSpec>(_crdPluralName).Subscribe(OnNext, OnError, OnCompleted);
             OnConnected?.Invoke(this, EventArgs.Empty);
             _logger.LogDebug($"Subscribed to {_crdPluralName}.");
         }
@@ -68,6 +72,14 @@ namespace Contrib.IdentityServer4.KubernetesStore
             Subscribe();
         }
 
+        private void OnCompleted()
+        {
+            _logger.LogDebug($"Connection closed by Kube API during watch for custom resource of type {typeof(TSpec).Name}. Resubscribing...");
+            OnConnectionError?.Invoke(this, new OperationCanceledException());
+            Thread.Sleep(1000);
+            Subscribe();
+        }
+
         private void DisposeSubscriptions()
         {
             _subscription?.Dispose();
@@ -75,7 +87,11 @@ namespace Contrib.IdentityServer4.KubernetesStore
             _logger.LogDebug($"Unsubscribed from {_crdPluralName}.");
         }
 
-        public virtual void Dispose() => DisposeSubscriptions();
+        public virtual void Dispose()
+        {
+            _cancellationTokenSource?.Cancel();
+            DisposeSubscriptions();
+        }
 
         private class CrdMemento : IEnumerable<TSpec>
         {
