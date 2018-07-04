@@ -1,6 +1,8 @@
 ﻿using System;
+using System.Net;
 using System.Reactive.Subjects;
 using FluentAssertions;
+using HTTPlease;
 using IdentityServer4.Models;
 using KubeClient.Models;
 using Microsoft.Extensions.Logging;
@@ -88,7 +90,7 @@ namespace Contrib.IdentityServer4.KubernetesStore
 
             _resourceSubject.OnError(new Exception());
 
-            _resourceClientMock.Verify(mock => mock.Watch<Client>(It.IsAny<string>()), Times.Exactly(2));
+            _resourceClientMock.Verify(mock => mock.Watch<Client>(It.IsAny<string>(), It.IsAny<string>()), Times.Exactly(2));
         }
 
         [Fact]
@@ -98,7 +100,7 @@ namespace Contrib.IdentityServer4.KubernetesStore
 
             _resourceSubject.OnCompleted();
 
-            _resourceClientMock.Verify(mock => mock.Watch<Client>(It.IsAny<string>()), Times.Exactly(2));
+            _resourceClientMock.Verify(mock => mock.Watch<Client>(It.IsAny<string>(), It.IsAny<string>()), Times.Exactly(2));
         }
 
         [Fact]
@@ -109,18 +111,29 @@ namespace Contrib.IdentityServer4.KubernetesStore
             _watcher.Dispose();
             _resourceSubject.OnCompleted();
 
-            _resourceClientMock.Verify(mock => mock.Watch<Client>(It.IsAny<string>()), Times.Exactly(1));
+            _resourceClientMock.Verify(mock => mock.Watch<Client>(It.IsAny<string>(), It.IsAny<string>()), Times.Exactly(1));
         }
 
         [Fact]
         public void PassesLastResourceVersionOnReconnect()
         {
             _watcher.StartWatching();
-            _resourceSubject.OnNext(CreateResourceEvent(ResourceEventType.Added, "4711", resourceVersion: "35"));
+            _resourceSubject.OnNext(CreateResourceEvent(ResourceEventType.Added, clientId: "4711", resourceVersion: "35"));
 
             _resourceSubject.OnError(new Exception());
 
             _resourceClientMock.Verify(mock => mock.Watch<Client>(It.IsAny<string>(), "35"));
+        }
+
+        [Fact]
+        public void DropsCacheWhenGettingResourceGone()
+        {
+            _watcher.StartWatching();
+            _resourceSubject.OnNext(CreateResourceEvent(ResourceEventType.Added, clientId: "4711", resourceVersion: "35"));
+
+            _resourceSubject.OnError(new HttpRequestException<StatusV1>(HttpStatusCode.Gone, new StatusV1()));
+
+            _watcher.Resources.Should().BeEmpty();
         }
 
         private static ResourceEventV1<CustomResource<Client>> CreateResourceEvent(ResourceEventType eventType, string clientId, string resourceVersion = "1")
