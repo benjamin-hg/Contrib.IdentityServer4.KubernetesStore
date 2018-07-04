@@ -13,15 +13,18 @@ namespace Contrib.IdentityServer4.KubernetesStore
     {
         private readonly TestResourceWatcher _watcher;
         private readonly Subject<IResourceEventV1<CustomResource<Client>>> _resourceSubject;
-        private Mock<ICustomResourceClient> _resourceClientMock;
+        private readonly Mock<ICustomResourceClient> _resourceClientMock;
 
         public CustomResourceWatcherFacts()
         {
             _resourceSubject = new Subject<IResourceEventV1<CustomResource<Client>>>();
             _resourceClientMock = new Mock<ICustomResourceClient>();
             _resourceClientMock.SetupSequence(mock => mock.Watch<Client>(It.IsAny<string>()))
-                              .Returns(_resourceSubject)
-                              .Returns(new Subject<IResourceEventV1<CustomResource<Client>>>());
+                               .Returns(_resourceSubject)
+                               .Returns(new Subject<IResourceEventV1<CustomResource<Client>>>());
+            _resourceClientMock.SetupSequence(mock => mock.Watch<Client>(It.IsAny<string>(), It.IsAny<string>()))
+                               .Returns(_resourceSubject)
+                               .Returns(new Subject<IResourceEventV1<CustomResource<Client>>>());
             _watcher = new TestResourceWatcher(_resourceClientMock.Object);
             _watcher.StartWatching();
         }
@@ -109,7 +112,18 @@ namespace Contrib.IdentityServer4.KubernetesStore
             _resourceClientMock.Verify(mock => mock.Watch<Client>(It.IsAny<string>()), Times.Exactly(1));
         }
 
-        private static ResourceEventV1<CustomResource<Client>> CreateResourceEvent(ResourceEventType eventType, string clientId)
+        [Fact]
+        public void PassesLastResourceVersionOnReconnect()
+        {
+            _watcher.StartWatching();
+            _resourceSubject.OnNext(CreateResourceEvent(ResourceEventType.Added, "4711", resourceVersion: "35"));
+
+            _resourceSubject.OnError(new Exception());
+
+            _resourceClientMock.Verify(mock => mock.Watch<Client>(It.IsAny<string>(), "35"));
+        }
+
+        private static ResourceEventV1<CustomResource<Client>> CreateResourceEvent(ResourceEventType eventType, string clientId, string resourceVersion = "1")
             => new ResourceEventV1<CustomResource<Client>>
             {
                 EventType = eventType,
@@ -118,7 +132,8 @@ namespace Contrib.IdentityServer4.KubernetesStore
                     Metadata = new ObjectMetaV1
                     {
                         Namespace = "namespace",
-                        Name = "identityclient"
+                        Name = "identityclient",
+                        ResourceVersion = resourceVersion
                     },
                     Spec = new Client {ClientId = clientId}
                 }

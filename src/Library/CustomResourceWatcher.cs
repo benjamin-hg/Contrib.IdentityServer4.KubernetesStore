@@ -15,6 +15,7 @@ namespace Contrib.IdentityServer4.KubernetesStore
         private readonly ICustomResourceClient _client;
         private readonly string _crdPluralName;
         private IDisposable _subscription;
+        private string _lastSeenResourceVersion;
 
         protected CustomResourceWatcher(ILogger logger, ICustomResourceClient client, string crdPluralName)
         {
@@ -39,13 +40,22 @@ namespace Contrib.IdentityServer4.KubernetesStore
                 return;
 
             DisposeSubscriptions();
-            _subscription = _client.Watch<TSpec>(_crdPluralName).Subscribe(OnNext, OnError, OnCompleted);
+            _subscription = CreateResourceObservable().Subscribe(OnNext, OnError, OnCompleted);
             OnConnected?.Invoke(this, EventArgs.Empty);
             _logger.LogDebug($"Subscribed to {_crdPluralName}.");
         }
 
+        private IObservable<IResourceEventV1<CustomResource<TSpec>>> CreateResourceObservable()
+        {
+            if (string.IsNullOrWhiteSpace(_lastSeenResourceVersion))
+                return _client.Watch<TSpec>(_crdPluralName);
+
+            return _client.Watch<TSpec>(_crdPluralName, _lastSeenResourceVersion);
+        }
+
         private void OnNext(IResourceEventV1<CustomResource<TSpec>> @event)
         {
+            _lastSeenResourceVersion = @event.Resource.Metadata.ResourceVersion;
             switch (@event.EventType)
             {
                 case ResourceEventType.Added:
