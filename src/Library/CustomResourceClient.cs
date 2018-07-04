@@ -27,7 +27,7 @@ namespace Contrib.IdentityServer4.KubernetesStore
             string resourceVersion = string.Empty;
 
             if (!string.IsNullOrWhiteSpace(lastSeenResourceVersion))
-                resourceVersion = $"&resource_version={lastSeenResourceVersion}";
+                resourceVersion = $"&resourceVersion={lastSeenResourceVersion}";
 
             return ObserveEvents<CustomResource<TSpec>>(KubeRequest.Create($"/apis/stable.contrib.identityserver.io/v1/namespaces/{_kubeNamespace}/{crdPluralName}?watch=true{resourceVersion}"));
         }
