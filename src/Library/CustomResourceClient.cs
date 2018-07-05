@@ -19,9 +19,6 @@ namespace Contrib.IdentityServer4.KubernetesStore
             _kubeNamespace = options.Value.Namespace ?? string.Empty;
         }
 
-        public IObservable<IResourceEventV1<CustomResource<TSpec>>> Watch<TSpec>(string apiGroup, string crdPluralName)
-            => ObserveEvents<CustomResource<TSpec>>(KubeRequest.Create($"/apis/{apiGroup}/v1/namespaces/{_kubeNamespace}/{crdPluralName}?watch=true"));
-
         public IObservable<IResourceEventV1<CustomResource<TSpec>>> Watch<TSpec>(string apiGroup, string crdPluralName, string lastSeenResourceVersion)
         {
             string resourceVersion = string.Empty;
