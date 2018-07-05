@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using System.Net;
 using System.Threading;
 using HTTPlease;
@@ -12,7 +13,7 @@ namespace Contrib.IdentityServer4.KubernetesStore
     public abstract class CustomResourceWatcher<TSpec> : ICustomResourceWatcher<TSpec>, IDisposable
     {
         private const string RESOURCE_VERSION_NONE = "0";
-        private readonly Dictionary<string, TSpec> _resources = new Dictionary<string, TSpec>();
+        private readonly Dictionary<string, CustomResource<TSpec>> _resources = new Dictionary<string, CustomResource<TSpec>>();
         private readonly CancellationTokenSource _cancellationTokenSource = new CancellationTokenSource();
         private readonly ILogger _logger;
         private readonly ICustomResourceClient _client;
@@ -57,18 +58,45 @@ namespace Contrib.IdentityServer4.KubernetesStore
             {
                 case ResourceEventType.Added:
                 case ResourceEventType.Modified:
-                    _resources[@event.Resource.GlobalName] = @event.Resource.Spec;
+                    UpsertResource(@event);
                     break;
                 case ResourceEventType.Deleted:
-                    if (_resources.ContainsKey(@event.Resource.GlobalName))
-                        _resources.Remove(@event.Resource.GlobalName);
+                    DeleteResource(@event);
                     break;
                 case ResourceEventType.Error:
+                    _logger.LogWarning($"Got erroneous resource '{typeof(TSpec).Name}' with name {@event.Resource.GlobalName}: {@event.Resource.Status.Message}");
                     break;
                 default:
                     throw new ArgumentOutOfRangeException();
             }
-            _logger.LogInformation($"{@event.EventType} {@event.Resource.GlobalName}");
+        }
+
+        private void DeleteResource(IResourceEventV1<CustomResource<TSpec>> @event)
+        {
+            if (_resources.ContainsKey(@event.Resource.GlobalName))
+            {
+                _resources.Remove(@event.Resource.GlobalName);
+                _logger.LogInformation($"Removed resource '{typeof(TSpec).Name}' with name {@event.Resource.GlobalName}");
+            }
+        }
+
+        private void UpsertResource(IResourceEventV1<CustomResource<TSpec>> @event)
+        {
+            if (_resources.ContainsKey(@event.Resource.GlobalName)
+             && _resources[@event.Resource.GlobalName].Metadata.ResourceVersion.Equals(@event.Resource.Metadata.ResourceVersion))
+            {
+                _resources[@event.Resource.GlobalName] = @event.Resource;
+                _logger.LogInformation($"Modified resource '{typeof(TSpec).Name}' with name {@event.Resource.GlobalName}");
+            }
+            else if (!_resources.ContainsKey(@event.Resource.GlobalName))
+            {
+                _resources.Add(@event.Resource.GlobalName, @event.Resource);
+                _logger.LogInformation($"Added resource '{typeof(TSpec).Name}' with name {@event.Resource.GlobalName}");
+            }
+            else
+            {
+                _logger.LogDebug($"Got resource '{typeof(TSpec).Name}' with name {@event.Resource.GlobalName} without changes");
+            }
         }
 
         private void OnError(Exception exception)
@@ -109,11 +137,11 @@ namespace Contrib.IdentityServer4.KubernetesStore
 
         private class CrdMemento : IEnumerable<TSpec>
         {
-            private readonly Dictionary<string, TSpec> _toIterate;
+            private readonly Dictionary<string, CustomResource<TSpec>> _toIterate;
 
-            public CrdMemento(Dictionary<string, TSpec> toIterate) => _toIterate = toIterate;
+            public CrdMemento(Dictionary<string, CustomResource<TSpec>> toIterate) => _toIterate = toIterate;
 
-            public IEnumerator<TSpec> GetEnumerator() => _toIterate.Values.GetEnumerator();
+            public IEnumerator<TSpec> GetEnumerator() => _toIterate.Values.Select(v => v.Spec).GetEnumerator();
 
             IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
         }
