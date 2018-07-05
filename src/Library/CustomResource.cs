@@ -10,6 +10,14 @@ namespace Contrib.IdentityServer4.KubernetesStore
 
         public StatusV1 Status { get; set; }
 
-        public string GlobalName => $"{Metadata.Namespace ?? "[cluster]"}.{Metadata.Name}";
+        public string GlobalName
+        {
+            get
+            {
+                return string.IsNullOrWhiteSpace(Metadata.Namespace)
+                           ? $"[cluster].{Metadata.Name}"
+                           : $"{Metadata.Namespace}.{Metadata.Name}";
+            }
+        }
     }
 }
