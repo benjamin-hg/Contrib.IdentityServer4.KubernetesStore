@@ -84,7 +84,7 @@ namespace Contrib.IdentityServer4.KubernetesStore
         private void UpsertResource(IResourceEventV1<CustomResource<TSpec>> @event)
         {
             if (_resources.ContainsKey(@event.Resource.GlobalName)
-             && _resources[@event.Resource.GlobalName].Metadata.ResourceVersion.Equals(@event.Resource.Metadata.ResourceVersion))
+             && !_resources[@event.Resource.GlobalName].Metadata.ResourceVersion.Equals(@event.Resource.Metadata.ResourceVersion))
             {
                 _resources[@event.Resource.GlobalName] = @event.Resource;
                 _logger.LogInformation($"Modified resource '{typeof(TSpec).Name}' with name {@event.Resource.GlobalName}");

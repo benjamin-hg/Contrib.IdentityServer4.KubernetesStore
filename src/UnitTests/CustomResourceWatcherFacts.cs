@@ -41,8 +41,8 @@ namespace Contrib.IdentityServer4.KubernetesStore
         [Fact]
         public void ModifiedResourceGetsUpdatedInCache()
         {
-            var addedResource = CreateResourceEvent(ResourceEventType.Added, "expectedClientId");
-            var modifiedResource = CreateResourceEvent(ResourceEventType.Modified, "expectedClientId");
+            var addedResource = CreateResourceEvent(ResourceEventType.Added, "expectedClientId", resourceVersion: "4711");
+            var modifiedResource = CreateResourceEvent(ResourceEventType.Modified, "expectedClientId", resourceVersion: "4712");
             modifiedResource.Resource.Spec.ClientName = "clientname";
             _resourceSubject.OnNext(addedResource);
 
