@@ -8,7 +8,7 @@ namespace Contrib.IdentityServer4.KubernetesStore
     public class ApiResourceWatcher : CustomResourceWatcher<ApiResource>
     {
         public ApiResourceWatcher(ILogger<CustomResourceWatcher<ApiResource>> logger, ICustomResourceClient client)
-            : base(logger, client, crdPluralName: "identityapiresources")
+            : base(logger, client, apiGroup: "stable.contrib.identityserver.io", crdPluralName: "identityapiresources")
         {}
     }
 }

@@ -19,17 +19,17 @@ namespace Contrib.IdentityServer4.KubernetesStore
             _kubeNamespace = options.Value.Namespace ?? string.Empty;
         }
 
-        public IObservable<IResourceEventV1<CustomResource<TSpec>>> Watch<TSpec>(string crdPluralName)
-            => ObserveEvents<CustomResource<TSpec>>(KubeRequest.Create($"/apis/stable.contrib.identityserver.io/v1/namespaces/{_kubeNamespace}/{crdPluralName}?watch=true"));
+        public IObservable<IResourceEventV1<CustomResource<TSpec>>> Watch<TSpec>(string apiGroup, string crdPluralName)
+            => ObserveEvents<CustomResource<TSpec>>(KubeRequest.Create($"/apis/{apiGroup}/v1/namespaces/{_kubeNamespace}/{crdPluralName}?watch=true"));
 
-        public IObservable<IResourceEventV1<CustomResource<TSpec>>> Watch<TSpec>(string crdPluralName, string lastSeenResourceVersion)
+        public IObservable<IResourceEventV1<CustomResource<TSpec>>> Watch<TSpec>(string apiGroup, string crdPluralName, string lastSeenResourceVersion)
         {
             string resourceVersion = string.Empty;
 
             if (!string.IsNullOrWhiteSpace(lastSeenResourceVersion))
                 resourceVersion = $"&resourceVersion={lastSeenResourceVersion}";
 
-            return ObserveEvents<CustomResource<TSpec>>(KubeRequest.Create($"/apis/stable.contrib.identityserver.io/v1/namespaces/{_kubeNamespace}/{crdPluralName}?watch=true{resourceVersion}"));
+            return ObserveEvents<CustomResource<TSpec>>(KubeRequest.Create($"/apis/{apiGroup}/v1/namespaces/{_kubeNamespace}/{crdPluralName}?watch=true{resourceVersion}"));
         }
     }
 }

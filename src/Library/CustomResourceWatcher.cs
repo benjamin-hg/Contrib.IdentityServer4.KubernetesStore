@@ -16,14 +16,16 @@ namespace Contrib.IdentityServer4.KubernetesStore
         private readonly CancellationTokenSource _cancellationTokenSource = new CancellationTokenSource();
         private readonly ILogger _logger;
         private readonly ICustomResourceClient _client;
+        private readonly string _apiGroup;
         private readonly string _crdPluralName;
         private IDisposable _subscription;
         private string _lastSeenResourceVersion = RESOURCE_VERSION_NONE;
 
-        protected CustomResourceWatcher(ILogger logger, ICustomResourceClient client, string crdPluralName)
+        protected CustomResourceWatcher(ILogger logger, ICustomResourceClient client, string apiGroup, string crdPluralName)
         {
             _logger = logger;
             _client = client;
+            _apiGroup = apiGroup;
             _crdPluralName = crdPluralName;
         }
 
@@ -43,7 +45,7 @@ namespace Contrib.IdentityServer4.KubernetesStore
                 return;
 
             DisposeSubscriptions();
-            _subscription = _client.Watch<TSpec>(_crdPluralName, _lastSeenResourceVersion).Subscribe(OnNext, OnError, OnCompleted);
+            _subscription = _client.Watch<TSpec>(_apiGroup, _crdPluralName, _lastSeenResourceVersion).Subscribe(OnNext, OnError, OnCompleted);
             OnConnected?.Invoke(this, EventArgs.Empty);
             _logger.LogDebug($"Subscribed to {_crdPluralName}.");
         }
