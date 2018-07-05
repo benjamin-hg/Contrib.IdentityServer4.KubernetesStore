@@ -30,7 +30,8 @@ namespace Contrib.IdentityServer4.KubernetesStore
             _crdPluralName = crdPluralName;
         }
 
-        public IEnumerable<TSpec> Resources => new CrdMemento(_resources);
+        public IEnumerable<TSpec> Resources => new ResourceMemento(_resources);
+        public IEnumerable<CustomResource<TSpec>> RawResources => new RawResourceMemento(_resources);
         public event EventHandler<Exception> OnConnectionError;
         public event EventHandler OnConnected;
 
@@ -146,13 +147,24 @@ namespace Contrib.IdentityServer4.KubernetesStore
             DisposeSubscriptions();
         }
 
-        private class CrdMemento : IEnumerable<TSpec>
+        private class ResourceMemento : IEnumerable<TSpec>
         {
             private readonly Dictionary<string, CustomResource<TSpec>> _toIterate;
 
-            public CrdMemento(Dictionary<string, CustomResource<TSpec>> toIterate) => _toIterate = toIterate;
+            public ResourceMemento(Dictionary<string, CustomResource<TSpec>> toIterate) => _toIterate = toIterate;
 
             public IEnumerator<TSpec> GetEnumerator() => _toIterate.Values.Select(v => v.Spec).GetEnumerator();
+
+            IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
+        }
+
+        private class RawResourceMemento : IEnumerable<CustomResource<TSpec>>
+        {
+            private readonly Dictionary<string, CustomResource<TSpec>> _toIterate;
+
+            public RawResourceMemento(Dictionary<string, CustomResource<TSpec>> toIterate) => _toIterate = toIterate;
+
+            public IEnumerator<CustomResource<TSpec>> GetEnumerator() => _toIterate.Values.GetEnumerator();
 
             IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
         }
