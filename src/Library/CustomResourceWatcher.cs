@@ -102,16 +102,27 @@ namespace Contrib.IdentityServer4.KubernetesStore
         private void OnError(Exception exception)
         {
             _logger.LogError(exception, $"Error occured during watch for custom resource of type {typeof(TSpec).Name}. Resubscribing...");
-            if (exception is HttpRequestException<StatusV1> requestException
-             && requestException.StatusCode == HttpStatusCode.Gone)
+            if (exception is HttpRequestException<StatusV1> requestException)
+            {
+                HandleSubscriptionStatusException(requestException);
+            }
+            OnConnectionError?.Invoke(this, exception);
+            Thread.Sleep(1000);
+            Subscribe();
+        }
+
+        private void HandleSubscriptionStatusException(HttpRequestException<StatusV1> exception)
+        {
+            if (exception.StatusCode == HttpStatusCode.Gone)
             {
                 _resources.Clear();
                 _logger.LogDebug($"Cleaned resource cache for '{typeof(TSpec).Name}' as the last seen resource version ({_lastSeenResourceVersion}) is gone.");
                 _lastSeenResourceVersion = RESOURCE_VERSION_NONE;
             }
-            OnConnectionError?.Invoke(this, exception);
-            Thread.Sleep(1000);
-            Subscribe();
+            else
+            {
+                _logger.LogWarning($"Got an error from Kube API for resource '{typeof(TSpec).Name}': {exception.Response.Message}");
+            }
         }
 
         private void OnCompleted()
