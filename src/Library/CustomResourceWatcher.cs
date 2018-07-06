@@ -19,15 +19,17 @@ namespace Contrib.IdentityServer4.KubernetesStore
         private readonly ICustomResourceClient _client;
         private readonly string _apiGroup;
         private readonly string _crdPluralName;
+        private readonly string _namespace;
         private IDisposable _subscription;
         private string _lastSeenResourceVersion = RESOURCE_VERSION_NONE;
 
-        protected CustomResourceWatcher(ILogger logger, ICustomResourceClient client, string apiGroup, string crdPluralName)
+        protected CustomResourceWatcher(ILogger logger, ICustomResourceClient client, string apiGroup, string crdPluralName, string @namespace)
         {
             _logger = logger;
             _client = client;
             _apiGroup = apiGroup;
             _crdPluralName = crdPluralName;
+            _namespace = @namespace;
         }
 
         public IEnumerable<TSpec> Resources => new ResourceMemento(_resources);
@@ -47,7 +49,7 @@ namespace Contrib.IdentityServer4.KubernetesStore
                 return;
 
             DisposeSubscriptions();
-            _subscription = _client.Watch<TSpec>(_apiGroup, _crdPluralName, _lastSeenResourceVersion).Subscribe(OnNext, OnError, OnCompleted);
+            _subscription = _client.Watch<TSpec>(_apiGroup, _crdPluralName, _namespace, _lastSeenResourceVersion).Subscribe(OnNext, OnError, OnCompleted);
             OnConnected?.Invoke(this, EventArgs.Empty);
             _logger.LogDebug($"Subscribed to {_crdPluralName}.");
         }

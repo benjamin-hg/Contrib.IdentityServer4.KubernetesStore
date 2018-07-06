@@ -21,7 +21,7 @@ namespace Contrib.IdentityServer4.KubernetesStore
         {
             _resourceSubject = new Subject<IResourceEventV1<CustomResource<Client>>>();
             _resourceClientMock = new Mock<ICustomResourceClient>();
-            _resourceClientMock.SetupSequence(mock => mock.Watch<Client>(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>()))
+            _resourceClientMock.SetupSequence(mock => mock.Watch<Client>(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>()))
                                .Returns(_resourceSubject)
                                .Returns(new Subject<IResourceEventV1<CustomResource<Client>>>());
             _watcher = new TestResourceWatcher(_resourceClientMock.Object);
@@ -87,7 +87,7 @@ namespace Contrib.IdentityServer4.KubernetesStore
 
             _resourceSubject.OnError(new Exception());
 
-            _resourceClientMock.Verify(mock => mock.Watch<Client>(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>()), Times.Exactly(2));
+            _resourceClientMock.Verify(mock => mock.Watch<Client>(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>()), Times.Exactly(2));
         }
 
         [Fact]
@@ -97,7 +97,7 @@ namespace Contrib.IdentityServer4.KubernetesStore
 
             _resourceSubject.OnCompleted();
 
-            _resourceClientMock.Verify(mock => mock.Watch<Client>(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>()), Times.Exactly(2));
+            _resourceClientMock.Verify(mock => mock.Watch<Client>(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>()), Times.Exactly(2));
         }
 
         [Fact]
@@ -108,7 +108,7 @@ namespace Contrib.IdentityServer4.KubernetesStore
             _watcher.Dispose();
             _resourceSubject.OnCompleted();
 
-            _resourceClientMock.Verify(mock => mock.Watch<Client>(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>()), Times.Exactly(1));
+            _resourceClientMock.Verify(mock => mock.Watch<Client>(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>()), Times.Exactly(1));
         }
 
         [Fact]
@@ -119,7 +119,7 @@ namespace Contrib.IdentityServer4.KubernetesStore
 
             _resourceSubject.OnError(new Exception());
 
-            _resourceClientMock.Verify(mock => mock.Watch<Client>(It.IsAny<string>(), It.IsAny<string>(), "35"));
+            _resourceClientMock.Verify(mock => mock.Watch<Client>(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), "35"));
         }
 
         [Fact]
@@ -152,7 +152,7 @@ namespace Contrib.IdentityServer4.KubernetesStore
         private class TestResourceWatcher : CustomResourceWatcher<Client>
         {
             public TestResourceWatcher(ICustomResourceClient client)
-                : base(new Logger<CustomResourceWatcher<Client>>(new LoggerFactory()), client, apiGroup: "stable.contrib.identityserver.io", crdPluralName: "identityclients")
+                : base(new Logger<CustomResourceWatcher<Client>>(new LoggerFactory()), client, apiGroup: "stable.contrib.identityserver.io", crdPluralName: "identityclients", @namespace: string.Empty)
             {
                 OnConnected += (sender, args) => OnConnectedTriggered = true;
                 OnConnectionError += (sender, args) => OnConnectionErrorTriggered = true;
