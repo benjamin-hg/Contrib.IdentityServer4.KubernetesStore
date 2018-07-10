@@ -1,4 +1,5 @@
 ﻿using System.Diagnostics.CodeAnalysis;
+using Contrib.KubeClient.CustomResources;
 using IdentityServer4.Models;
 using IdentityServer4.Stores;
 

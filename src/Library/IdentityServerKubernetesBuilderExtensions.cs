@@ -1,4 +1,5 @@
-﻿using IdentityServer4.Models;
+﻿using Contrib.KubeClient.CustomResources;
+using IdentityServer4.Models;
 using IdentityServer4.Services;
 using IdentityServer4.Stores;
 using Microsoft.Extensions.Configuration;
