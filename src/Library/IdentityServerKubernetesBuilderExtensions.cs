@@ -37,11 +37,6 @@ namespace Contrib.IdentityServer4.KubernetesStore
             return builder;
         }
 
-        private static IServiceCollection AddKubernetesClient(this IServiceCollection services)
-            => services.AddSingleton<KubeApiClientFactory>()
-                       .AddSingleton(provider => provider.GetRequiredService<KubeApiClientFactory>().Build())
-                       .AddSingleton<ICustomResourceClient, CustomResourceClient>();
-
         private static IServiceCollection AddKubernetesResourceWatchers(this IServiceCollection services)
             => services.AddSingleton<ICustomResourceWatcher<Client>, ClientWatcher>()
                        .AddSingleton<ICustomResourceWatcher<IdentityResource>, IdentityResourceWatcher>()
