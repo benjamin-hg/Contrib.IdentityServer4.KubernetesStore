@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using Contrib.KubeClient.CustomResources;
 using IdentityServer4.Models;
 using IdentityServer4.Services;
@@ -17,6 +17,7 @@ namespace Contrib.IdentityServer4.KubernetesStore
         /// <summary>
         /// Configures Kubernetes Custom Resource Definition implementation of
         /// <see cref="IClientStore"/>, <see cref="IResourceStore"/>, and <see cref="ICorsPolicyService"/> with IdentityServer.
+        /// Remember to call <see cref="Contrib.KubeClient.CustomResources.DependencyInjectionExtensions.UseCustomResourceWatchers"/> during startup.
         /// </summary>
         /// <param name="builder">The builder.</param>
         /// <param name="identityResources"><see cref="IdentityResource"/> to be used. Default is an empty list.</param>
@@ -26,6 +27,7 @@ namespace Contrib.IdentityServer4.KubernetesStore
         /// <summary>
         /// Configures Kubernetes Custom Resource Definition implementation of
         /// <see cref="IClientStore"/>, <see cref="IResourceStore"/>, and <see cref="ICorsPolicyService"/> with IdentityServer.
+        /// Remember to call <see cref="Contrib.KubeClient.CustomResources.DependencyInjectionExtensions.UseCustomResourceWatchers"/> during startup.
         /// </summary>
         /// <param name="builder">The builder.</param>
         /// <param name="configuration">The configuration section to be bound to <see cref="KubernetesConfigurationStoreOptions"/>.</param>
@@ -42,8 +44,8 @@ namespace Contrib.IdentityServer4.KubernetesStore
         }
 
         private static IServiceCollection AddKubernetesResourceWatchers(this IServiceCollection services)
-            => services.AddSingleton<ICustomResourceWatcher<Client>, ClientWatcher>()
-                       .AddSingleton<ICustomResourceWatcher<ApiResource>, ApiResourceWatcher>();
+            => services.AddCustomResourceWatcher(ClientResource.Definition)
+                       .AddCustomResourceWatcher(ApiResourceResource.Definition);
 
         private static IServiceCollection AddKubernetesStores(this IServiceCollection services, IEnumerable<IdentityResource> identityResources)
         {
