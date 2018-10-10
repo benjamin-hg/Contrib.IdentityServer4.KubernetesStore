@@ -17,7 +17,7 @@
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="IdentityServer4" Version="2.2.0" />
-    <PackageReference Include="System.Reactive" Version="4.0.0" />
+    <PackageReference Include="System.Reactive" Version="4.1.1" />
     <PackageReference Include="Contrib.KubeClient.CustomResources" Version="0.1.1" />
   </ItemGroup>
   <ItemGroup>
