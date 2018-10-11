@@ -12,7 +12,7 @@ namespace Contrib.IdentityServer4.KubernetesStore
     /// <summary>
     /// Extension methods to add Kubernetes support to IdentityServer.
     /// </summary>
-    public static class IdentityServerKubernetesBuilderExtensions
+    public static class DependencyInjectionExtensions
     {
         /// <summary>
         /// Configures Kubernetes Custom Resource Definition implementation of
@@ -34,26 +34,38 @@ namespace Contrib.IdentityServer4.KubernetesStore
         /// <param name="identityResources"><see cref="IdentityResource"/> to be used. Default is an empty list.</param>
         public static IIdentityServerBuilder AddKubernetesConfigurationStore(this IIdentityServerBuilder builder, IConfiguration configuration, IEnumerable<IdentityResource> identityResources = null)
         {
-            builder.Services
-                   .Configure<KubernetesConfigurationStoreOptions>(configuration)
-                   .AddKubernetesClient()
-                   .AddKubernetesResourceWatchers()
-                   .AddKubernetesStores(identityResources ?? new List<IdentityResource>());
-
+            builder.Services.AddIdentityKubernetesConfigurationStore(configuration, identityResources);
             return builder;
         }
 
-        private static IServiceCollection AddKubernetesResourceWatchers(this IServiceCollection services)
-            => services.AddCustomResourceWatcher(ClientResource.Definition)
-                       .AddCustomResourceWatcher(ApiResourceResource.Definition);
+        /// <summary>
+        /// Configures Kubernetes Custom Resource Definition implementation of
+        /// <see cref="IClientStore"/>, <see cref="IResourceStore"/>, and <see cref="ICorsPolicyService"/> with IdentityServer.
+        /// Remember to call <see cref="KubeClient.CustomResources.DependencyInjectionExtensions.UseCustomResourceWatchers"/> during startup.
+        /// </summary>
+        /// <param name="services">The service collection to register the services in.</param>
+        /// <param name="identityResources"><see cref="IdentityResource"/> to be used. Default is an empty list.</param>
+        public static IServiceCollection AddIdentityKubernetesConfigurationStore(this IServiceCollection services, IEnumerable<IdentityResource> identityResources = null)
+            => services.AddIdentityKubernetesConfigurationStore(new ConfigurationBuilder().Build(), identityResources);
 
-        private static IServiceCollection AddKubernetesStores(this IServiceCollection services, IEnumerable<IdentityResource> identityResources)
+        /// <summary>
+        /// Configures Kubernetes Custom Resource Definition implementation of
+        /// <see cref="IClientStore"/>, <see cref="IResourceStore"/>, and <see cref="ICorsPolicyService"/> with IdentityServer.
+        /// Remember to call <see cref="KubeClient.CustomResources.DependencyInjectionExtensions.UseCustomResourceWatchers"/> during startup.
+        /// </summary>
+        /// <param name="services">The service collection to register the services in.</param>
+        /// <param name="configuration">The configuration section to be bound to <see cref="KubernetesConfigurationStoreOptions"/>.</param>
+        /// <param name="identityResources"><see cref="IdentityResource"/> to be used. Default is an empty list.</param>
+        public static IServiceCollection AddIdentityKubernetesConfigurationStore(this IServiceCollection services, IConfiguration configuration, IEnumerable<IdentityResource> identityResources = null)
         {
+            services.Configure<KubernetesConfigurationStoreOptions>(configuration)
+                    .AddKubernetesClient();
+            services.AddCustomResourceWatcher(ClientResource.Definition)
+                    .AddCustomResourceWatcher(ApiResourceResource.Definition);
             services.AddSingleton<IClientStore, KubernetesClientStore>()
                     .AddSingleton<IResourceStore, KubernetesResourceStore>()
                     .AddSingleton<ICorsPolicyService, KubernetesCorsPolicyService>()
-                    .TryAddSingleton(identityResources);
-
+                    .TryAddSingleton(identityResources ?? new List<IdentityResource>());
             return services;
         }
     }
