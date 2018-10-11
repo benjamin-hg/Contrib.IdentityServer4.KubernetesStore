@@ -5,7 +5,7 @@ namespace Contrib.IdentityServer4.KubernetesStore
 {
     public class ApiResourceResource : CustomResource<ApiResource>
     {
-        public static CustomResourceDefinition<ClientResource> Definition { get; } = new CustomResourceDefinition<ClientResource>(apiVersion: "stable.contrib.identityserver.io/v1", pluralName: "identityapiresources");
+        public static CustomResourceDefinition<ApiResourceResource> Definition { get; } = new CustomResourceDefinition<ApiResourceResource>(apiVersion: "stable.contrib.identityserver.io/v1", pluralName: "identityapiresources");
 
         public ApiResourceResource()
         {}
