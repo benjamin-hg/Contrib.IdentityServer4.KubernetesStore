@@ -10,7 +10,7 @@ namespace Contrib.IdentityServer4.KubernetesStore
     public class KubernetesCorsPolicyService : InMemoryCorsPolicyService
     {
         public KubernetesCorsPolicyService(ILogger<KubernetesCorsPolicyService> logger, ICustomResourceWatcher<ClientResource> clientWatcher)
-            : base(logger, clientWatcher.RawResources.Select(x => x.Spec))
+            : base(logger, clientWatcher.RawResources.Select(resource => resource.Spec))
         {}
     }
 }

@@ -11,7 +11,7 @@ namespace Contrib.IdentityServer4.KubernetesStore
     public class KubernetesResourceStore : InMemoryResourcesStore
     {
         public KubernetesResourceStore(IEnumerable<IdentityResource> identityResources, ICustomResourceWatcher<ApiResourceResource> apiResourceWatcher)
-            : base(identityResources, apiResourceWatcher.RawResources.Select(x => x.Spec))
+            : base(identityResources, apiResourceWatcher.RawResources.Select(resource => resource.Spec))
         {}
     }
 }
