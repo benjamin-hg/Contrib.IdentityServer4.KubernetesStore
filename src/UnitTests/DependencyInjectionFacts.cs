@@ -16,9 +16,12 @@ namespace Contrib.IdentityServer4.KubernetesStore
             var provider = new ServiceCollection()
                           .AddLogging()
                           .Configure<KubernetesConfigurationStoreOptions>(opt => opt.ConnectionString = "http://example.com/")
-                          .AddIdentityKubernetesConfigurationStore()
+                          .AddIdentityResourceWatchers()
+                          .AddIdentityKubernetesStores()
                           .BuildServiceProvider();
 
+            provider.GetRequiredService<ICustomResourceClient<ClientResource>>();
+            provider.GetRequiredService<ICustomResourceClient<ApiResourceResource>>();
             provider.GetRequiredService<ICustomResourceWatcher<ClientResource>>();
             provider.GetRequiredService<ICustomResourceWatcher<ApiResourceResource>>();
             provider.GetRequiredService<IClientStore>();
