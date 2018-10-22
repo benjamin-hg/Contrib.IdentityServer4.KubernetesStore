@@ -3,6 +3,7 @@ using Contrib.KubeClient.CustomResources;
 using IdentityServer4.Models;
 using IdentityServer4.Services;
 using IdentityServer4.Stores;
+using KubeClient;
 using Microsoft.Extensions.DependencyInjection;
 using Xunit;
 
@@ -13,12 +14,13 @@ namespace Contrib.IdentityServer4.KubernetesStore
         [Fact]
         public void ServicesAreRegistered()
         {
-            var provider = new ServiceCollection()
-                          .AddLogging()
-                          .Configure<KubernetesConfigurationStoreOptions>(opt => opt.ConnectionString = "http://example.com/")
-                          .AddIdentityResourceWatchers()
-                          .AddIdentityKubernetesStores()
-                          .BuildServiceProvider();
+            var services = new ServiceCollection();
+            services.AddLogging()
+                    .AddKubeClient(new KubeClientOptions("http://example.com/"));
+            services.AddIdentityResourceWatchers()
+                    .AddIdentityKubernetesStores();
+
+            var provider = services.BuildServiceProvider();
 
             provider.GetRequiredService<ICustomResourceClient<ClientResource>>();
             provider.GetRequiredService<ICustomResourceClient<ApiResourceResource>>();
