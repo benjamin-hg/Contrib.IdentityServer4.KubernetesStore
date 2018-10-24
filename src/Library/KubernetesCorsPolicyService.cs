@@ -24,7 +24,7 @@ namespace Contrib.IdentityServer4.KubernetesStore
             }
             else
             {
-                logger.LogCritical($"Identity Client with name {client.ClientName} has invalid AllowedCorsOrigins");
+                logger.LogWarning($"Identity Client with name {client.ClientName} has invalid AllowedCorsOrigins");
                 return false;
             }
         }
