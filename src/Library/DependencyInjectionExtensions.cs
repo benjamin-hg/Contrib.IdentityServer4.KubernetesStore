@@ -24,7 +24,6 @@ namespace Contrib.IdentityServer4.KubernetesStore
 
         /// <summary>
         /// Adds <see cref="ICustomResourceWatcher{TResource}"/>s for <see cref="ClientResource"/>s and <see cref="ApiResourceResource"/>s.
-        /// Remember to call <see cref="Contrib.KubeClient.CustomResources.DependencyInjectionExtensions.UseCustomResourceWatchers"/> during startup.
         /// </summary>
         public static IServiceCollection AddIdentityResourceWatchers(this IServiceCollection services)
             => services.AddCustomResourceWatcher(ClientResource.Definition)
@@ -32,7 +31,6 @@ namespace Contrib.IdentityServer4.KubernetesStore
 
         /// <summary>
         /// Adds <see cref="IClientStore"/>, <see cref="IResourceStore"/> and <see cref="ICorsPolicyService"/> implementations backed by Kubernetes Custom Resources.
-        /// Remember to call <see cref="Contrib.KubeClient.CustomResources.DependencyInjectionExtensions.UseCustomResourceWatchers"/> during startup.
         /// </summary>
         /// <param name="services">The service collection.</param>
         /// <param name="identityResources"><see cref="IdentityResource"/> to be used. Default is an empty list.</param>
@@ -48,7 +46,6 @@ namespace Contrib.IdentityServer4.KubernetesStore
 
         /// <summary>
         /// Adds <see cref="IClientStore"/>, <see cref="IResourceStore"/> and <see cref="ICorsPolicyService"/> implementations backed by Kubernetes Custom Resources.
-        /// Remember to call <see cref="Contrib.KubeClient.CustomResources.DependencyInjectionExtensions.UseCustomResourceWatchers"/> during startup.
         /// </summary>
         /// <param name="builder">The builder.</param>
         /// <param name="identityResources"><see cref="IdentityResource"/> to be used. Default is an empty list.</param>
