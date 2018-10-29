@@ -7,12 +7,13 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Library", "Library\Library.
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UnitTests", "UnitTests\UnitTests.csproj", "{E05AD4C5-0D2C-49F9-AB72-480AD91A1CAD}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "_build", "_build", "{383C57F7-3011-4E49-A835-D5934859E0F3}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "crd", "crd", "{383C57F7-3011-4E49-A835-D5934859E0F3}"
 ProjectSection(SolutionItems) = preProject
-	..\appveyor.yml = ..\appveyor.yml
+	..\crd\apiresource.yaml = ..\crd\apiresource.yaml
+	..\crd\identityclient.yaml = ..\crd\identityclient.yaml
 EndProjectSection
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "_docs", "_docs", "{B30BEE06-409C-4D16-8BE6-4FBD5C6E20AB}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "docs", "docs", "{B30BEE06-409C-4D16-8BE6-4FBD5C6E20AB}"
 ProjectSection(SolutionItems) = preProject
 	..\readme.md = ..\readme.md
 EndProjectSection

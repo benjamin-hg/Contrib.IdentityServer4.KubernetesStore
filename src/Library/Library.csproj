@@ -19,8 +19,4 @@
     <PackageReference Include="IdentityServer4" Version="2.2.0" />
     <PackageReference Include="Contrib.KubeClient.CustomResources" Version="0.10.0" />
   </ItemGroup>
-  <ItemGroup>
-    <None Remove="IdentityClient.crd.yml" />
-    <EmbeddedResource Include="IdentityClient.crd.yml" />
-  </ItemGroup>
 </Project>

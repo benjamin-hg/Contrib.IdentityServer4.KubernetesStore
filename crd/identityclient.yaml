@@ -8,7 +8,7 @@ spec:
   scope: Namespaced
   names:
     plural: identityclients
-    singular: identityclients
+    singular: identityclient
     kind: IdentityClient
     shortNames:
     - idc
@@ -26,7 +26,6 @@ spec:
           properties:
             enabled:
               type: boolean
-              default: true
             clientId:
               type: string
             clientSecrets:
@@ -58,13 +57,10 @@ spec:
               type: string
             requireConsent:
               type: boolean
-              default: true
             allowAccessTokensViaBrowser:
               type: boolean
-              default: true
             alwaysIncludeUserClaimsInIdToken:
               type: boolean
-              default: false
             allowedGrantTypes:
               type: array
               items:
@@ -73,6 +69,8 @@ spec:
               type: array
               items:
                 type: string
+            frontChannelLogoutUri:
+              type: string
             postLogoutRedirectUris:
               type: array
               items:
@@ -83,7 +81,6 @@ spec:
                 type: string
             updateAccessTokenClaimsOnRefresh:
               type: boolean
-              default: true
             allowedCorsOrigins:
               type: array
               items:
@@ -92,4 +89,3 @@ spec:
               type: array
               items:
                 type: string
-
