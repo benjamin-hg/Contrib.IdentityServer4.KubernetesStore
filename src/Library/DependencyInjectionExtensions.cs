@@ -19,15 +19,15 @@ namespace Contrib.IdentityServer4.KubernetesStore
         /// Adds <see cref="ICustomResourceClient{TResource}"/>s for <see cref="ClientResource"/>s and <see cref="ApiResourceResource"/>s.
         /// </summary>
         public static IServiceCollection AddIdentityResourceClients(this IServiceCollection services)
-            => services.AddCustomResourceClient(ClientResource.Definition)
-                       .AddCustomResourceClient(ApiResourceResource.Definition);
+            => services.AddCustomResourceClient<ClientResource>()
+                       .AddCustomResourceClient<ApiResourceResource>();
 
         /// <summary>
         /// Adds <see cref="ICustomResourceWatcher{TResource}"/>s for <see cref="ClientResource"/>s and <see cref="ApiResourceResource"/>s.
         /// </summary>
         public static IServiceCollection AddIdentityResourceWatchers(this IServiceCollection services)
-            => services.AddCustomResourceWatcher(ClientResource.Definition)
-                       .AddCustomResourceWatcher(ApiResourceResource.Definition);
+            => services.AddCustomResourceWatcher<ClientResource>()
+                       .AddCustomResourceWatcher<ApiResourceResource>();
 
         /// <summary>
         /// Adds <see cref="IClientStore"/>, <see cref="IResourceStore"/> and <see cref="ICorsPolicyService"/> implementations backed by Kubernetes Custom Resources.

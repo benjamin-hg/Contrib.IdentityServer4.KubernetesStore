@@ -16,20 +16,20 @@ namespace Contrib.IdentityServer4.KubernetesStore
 
         private readonly List<ClientResource> _clientResources = new List<ClientResource>
         {
-            new ClientResource(new Client
+            new ClientResource("ns", "dummy", new Client
             {
                 ClientName = "NormalClient1",
-                AllowedCorsOrigins = { "http://example1.com", "https://another.example1.com"}
+                AllowedCorsOrigins = {"http://example1.com", "https://another.example1.com"}
             }),
-            new ClientResource(new Client
+            new ClientResource("ns", "dummy", new Client
             {
                 ClientName = "CorruptClient",
-                AllowedCorsOrigins = { "http://example0.com", "not // .a.valid }} URI", "https://another.example0.com"}
+                AllowedCorsOrigins = {"http://example0.com", "not // .a.valid }} URI", "https://another.example0.com"}
             }),
-            new ClientResource(new Client()
+            new ClientResource("ns", "dummy", new Client()
             {
                 ClientName = "NormalClient2",
-                AllowedCorsOrigins = { "http://example2.com", "https://another.example2.com"}
+                AllowedCorsOrigins = {"http://example2.com", "https://another.example2.com"}
             })
         };
 

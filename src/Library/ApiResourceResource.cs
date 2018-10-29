@@ -1,24 +1,28 @@
 using Contrib.KubeClient.CustomResources;
 using IdentityServer4.Models;
+using KellermanSoftware.CompareNetObjects;
+using Microsoft.AspNetCore.JsonPatch;
 
 namespace Contrib.IdentityServer4.KubernetesStore
 {
-    public class ApiResourceResource : CustomResource<ApiResource>
+    public class ApiResourceResource : CustomResource<ApiResource>, IPatchable<ApiResourceResource>
     {
-        public static CustomResourceDefinition<ApiResourceResource> Definition { get; } = new CustomResourceDefinition<ApiResourceResource>(apiVersion: "stable.contrib.identityserver.io/v1", pluralName: "identityapiresources");
+        public new static CustomResourceDefinition Definition { get; } = Crd.For(pluralName: "identityapiresources", kind: "IdentityApiResource");
 
         public ApiResourceResource()
-        {}
-
-        public ApiResourceResource(string @namespace, string name)
-            : base(@namespace, name)
+            : base(Definition)
         {}
 
         public ApiResourceResource(string @namespace, string name, ApiResource spec)
-            : base(@namespace, name, spec)
+            : base(Definition, @namespace, name, spec)
         {}
 
-        public ApiResourceResource(ApiResource spec) : base(spec)
-        {}
+        private static readonly CompareLogic SpecComparer = new CompareLogic();
+
+        protected override bool SpecEquals(ApiResource other)
+            => SpecComparer.Compare(Spec, other).AreEqual;
+
+        public void Patch(JsonPatchDocument<ApiResourceResource> patch)
+            => patch.Replace(x => x.Spec, Spec);
     }
 }

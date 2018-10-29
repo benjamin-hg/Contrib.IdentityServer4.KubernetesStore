@@ -16,7 +16,8 @@
     <Description>Configuration Store for IdentityServer4 using Kubernetes Custom Resources</Description>
   </PropertyGroup>
   <ItemGroup>
+    <PackageReference Include="CompareNETObjects" Version="4.57.0" />
     <PackageReference Include="IdentityServer4" Version="2.2.0" />
-    <PackageReference Include="Contrib.KubeClient.CustomResources" Version="0.10.0" />
+    <PackageReference Include="Contrib.KubeClient.CustomResources" Version="0.11.0" />
   </ItemGroup>
 </Project>
