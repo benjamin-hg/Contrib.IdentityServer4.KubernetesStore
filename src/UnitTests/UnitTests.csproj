@@ -1,12 +1,15 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
+
   <PropertyGroup>
     <AssemblyName>Contrib.IdentityServer4.KubernetesStore.UnitTests</AssemblyName>
     <RootNamespace>Contrib.IdentityServer4.KubernetesStore</RootNamespace>
+    <LangVersion>7.3</LangVersion>
     <TargetFramework>netcoreapp2.0</TargetFramework>
     <OutputType>Library</OutputType>
     <IsPackable>False</IsPackable>
     <TreatWarningsAsErrors>True</TreatWarningsAsErrors>
   </PropertyGroup>
+
   <ItemGroup>
     <PackageReference Include="FluentAssertions" Version="5.5.0" />
     <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="2.1.1" />
@@ -15,10 +18,13 @@
     <PackageReference Include="xunit" Version="2.4.1" />
     <PackageReference Include="xunit.runner.visualstudio" Version="2.4.1" />
   </ItemGroup>
+
   <ItemGroup>
     <ProjectReference Include="..\Library\Library.csproj" />
   </ItemGroup>
+
   <ItemGroup>
     <Service Include="{82a7f48d-3b50-4b1e-b82e-3ada8210c358}" />
   </ItemGroup>
+
 </Project>

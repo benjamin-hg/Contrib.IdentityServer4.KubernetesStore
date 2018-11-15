@@ -1,23 +1,32 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
+
   <PropertyGroup>
     <AssemblyName>Contrib.IdentityServer4.KubernetesStore</AssemblyName>
     <RootNamespace>Contrib.IdentityServer4.KubernetesStore</RootNamespace>
+    <LangVersion>7.3</LangVersion>
     <TargetFramework>netstandard2.0</TargetFramework>
     <OutputType>Library</OutputType>
-    <OutputPath>..\..\artifacts\$(AssemblyName)\</OutputPath>
+    <OutputPath>..\..\artifacts</OutputPath>
     <GenerateDocumentationFile>True</GenerateDocumentationFile>
     <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
-    <IncludeSource>True</IncludeSource>
+    <PublishRepositoryUrl>True</PublishRepositoryUrl>
+    <AllowedOutputExtensionsInPackageBuildOutputFolder>$(AllowedOutputExtensionsInPackageBuildOutputFolder);.pdb</AllowedOutputExtensionsInPackageBuildOutputFolder>
     <TreatWarningsAsErrors>True</TreatWarningsAsErrors>
     <NoWarn>$(NoWarn);1591</NoWarn>
   </PropertyGroup>
+
   <PropertyGroup>
     <Authors>AXOOM GmbH</Authors>
-    <Description>Configuration Store for IdentityServer4 using Kubernetes Custom Resources</Description>
+    <Copyright>Copyright (c) AXOOM GmbH</Copyright>
+    <PackageProjectUrl>https://github.com/AXOOM/Contrib.IdentityServer4.KubernetesStore</PackageProjectUrl>
+    <PackageTags>Kubernetes;IdentityServer4;CustomResources</PackageTags>
   </PropertyGroup>
+
   <ItemGroup>
     <PackageReference Include="CompareNETObjects" Version="4.57.0" />
     <PackageReference Include="IdentityServer4" Version="2.2.0" />
-    <PackageReference Include="Contrib.KubeClient.CustomResources" Version="0.11.4" />
+    <PackageReference Include="Contrib.KubeClient.CustomResources" Version="0.11.4" /> 
+    <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.0.0-beta-63127-02" PrivateAssets="All" />
   </ItemGroup>
+
 </Project>
