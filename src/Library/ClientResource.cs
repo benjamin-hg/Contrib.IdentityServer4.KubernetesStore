@@ -5,7 +5,7 @@ using Microsoft.AspNetCore.JsonPatch;
 
 namespace Contrib.IdentityServer4.KubernetesStore
 {
-    public class ClientResource : CustomResource<Client>, IPatchable<ClientResource>
+    public class ClientResource : CustomResource<Client>, IPayloadPatchable<ClientResource>
     {
         public new static CustomResourceDefinition Definition { get; } = Crd.For(pluralName: "identityclients", kind: "IdentityClient");
 
@@ -22,7 +22,7 @@ namespace Contrib.IdentityServer4.KubernetesStore
         protected override bool SpecEquals(Client other)
             => SpecComparer.Compare(Spec, other).AreEqual;
 
-        public void Patch(JsonPatchDocument<ClientResource> patch)
+        public void ToPayloadPatch(JsonPatchDocument<ClientResource> patch)
             => patch.Replace(x => x.Spec, Spec);
     }
 }
