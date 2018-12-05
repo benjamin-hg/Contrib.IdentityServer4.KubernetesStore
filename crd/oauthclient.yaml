@@ -1,9 +1,9 @@
 apiVersion: apiextensions.k8s.io/v1beta1
 kind: CustomResourceDefinition
 metadata:
-  name: oauthclients.stable.contrib.identityserver.io
+  name: oauthclients.contrib.identityserver.io
 spec:
-  group: stable.contrib.identityserver.io
+  group: contrib.identityserver.io
   version: v1
   scope: Namespaced
   names:
