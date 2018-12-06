@@ -11,7 +11,8 @@ spec:
     singular: oauthclient
     kind: OauthClient
     shortNames:
-    - idc
+    - oac
+    - client
   subresources:
     status: {}
   validation:

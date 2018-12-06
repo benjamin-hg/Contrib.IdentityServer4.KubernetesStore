@@ -11,7 +11,8 @@ spec:
     singular: apiresource
     kind: ApiResource
     shortNames:
-    - idapi
+    - apr
+    - apires
   subresources:
     status: {}
   validation:
