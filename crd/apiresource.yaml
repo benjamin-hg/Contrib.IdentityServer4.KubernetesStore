@@ -1,17 +1,18 @@
 apiVersion: apiextensions.k8s.io/v1beta1
 kind: CustomResourceDefinition
 metadata:
-  name: identityapiresources.stable.contrib.identityserver.io
+  name: apiresources.contrib.identityserver.io
 spec:
-  group: stable.contrib.identityserver.io
+  group: contrib.identityserver.io
   version: v1
   scope: Namespaced
   names:
-    plural: identityapiresources
-    singular: identityapiresource
-    kind: IdentityApiResource
+    plural: apiresources
+    singular: apiresource
+    kind: ApiResource
     shortNames:
-    - idapi
+    - apr
+    - apires
   subresources:
     status: {}
   validation:
