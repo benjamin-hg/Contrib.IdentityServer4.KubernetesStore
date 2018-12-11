@@ -1,8 +1,8 @@
+using System.Collections.Generic;
+using System.Linq;
 using IdentityServer4.Models;
 using IdentityServer4.Stores;
 using Microsoft.Extensions.Logging;
-using System.Collections.Generic;
-using System.Linq;
 
 namespace Contrib.IdentityServer4.KubernetesStore
 {
@@ -12,7 +12,8 @@ namespace Contrib.IdentityServer4.KubernetesStore
             ILogger logger,
             IEnumerable<IdentityResource> identityResources = null,
             IEnumerable<ApiResource> apiResources = null)
-            : base(EnsureUniqueIndentityScopeNames(identityResources, logger, apiResources), EnsureUniqueApiResourceScopeNames(apiResources, logger, identityResources)) { }
+            : base(EnsureUniqueIndentityScopeNames(identityResources, logger, apiResources), EnsureUniqueApiResourceScopeNames(apiResources, logger, identityResources))
+        {}
 
         internal static IEnumerable<ApiResource> EnsureUniqueApiResourceScopeNames(IEnumerable<ApiResource> apiResources, ILogger logger, IEnumerable<IdentityResource> identityResources)
         {
@@ -22,7 +23,6 @@ namespace Contrib.IdentityServer4.KubernetesStore
             {
                 var resultApiResource = apiResource;
                 foreach (var apiResourceScope in apiResource.Scopes)
-                {
                     if (allApiScopeNamesSoFar.Add(apiResourceScope.Name))
                     {
                         if (identityScopeNames.Contains(apiResourceScope.Name))
@@ -36,7 +36,6 @@ namespace Contrib.IdentityServer4.KubernetesStore
                         logger.LogError($"Duplicate Identity scope found: '{apiResource.Name}'. This is an invalid configuration. Use different names for Identity scopes.");
                         resultApiResource = CloneWithScopesExcept(resultApiResource, apiResourceScope);
                     }
-                }
                 yield return resultApiResource;
             }
         }
@@ -68,20 +67,13 @@ namespace Contrib.IdentityServer4.KubernetesStore
             var allIdentityScopeNamesSoFar = new HashSet<string>();
             var apiScopeNames = new HashSet<string>(apiResources.SelectMany(r => r.Scopes.Select(s => s.Name)));
             foreach (var identityResource in identityResources)
-            {
                 if (allIdentityScopeNamesSoFar.Add(identityResource.Name))
-                {
                     if (apiScopeNames.Contains(identityResource.Name))
                         logger.LogError($"Duplicate Identity scope name found: '{identityResource.Name}', it is used by another API scope. This is an invalid configuration. Use different names for Identity and API scopes.");
                     else
                         yield return identityResource;
-                }
                 else
-                {
                     logger.LogError($"Duplicate Identity scope found: '{identityResource.Name}'. This is an invalid configuration. Use different names for Identity scopes.");
-                }
-            }
         }
-
     }
 }
