@@ -16,26 +16,25 @@ namespace Contrib.IdentityServer4.KubernetesStore
 
         internal static IEnumerable<ApiResource> EnsureUniqueApiResourceScopeNames(IEnumerable<ApiResource> apiResources, ILogger logger, IEnumerable<IdentityResource> identityResources)
         {
-            var allApiScopeNamesSoFar = new List<string>();
-            var identityScopeNames = identityResources.Select(s => s.Name).ToList();
+            var allApiScopeNamesSoFar = new HashSet<string>();
+            var identityScopeNames = new HashSet<string>(identityResources.Select(s => s.Name));
             foreach (var apiResource in apiResources)
             {
                 var resultApiResource = apiResource;
                 foreach (var apiResourceScope in apiResource.Scopes)
                 {
-                    if (allApiScopeNamesSoFar.Contains(apiResourceScope.Name))
+                    if (allApiScopeNamesSoFar.Add(apiResourceScope.Name))
                     {
-                        logger.LogError($"Duplicate Identity scope found: '{apiResource.Name}'. This is an invalid configuration. Use different names for Identity scopes.");
-                        resultApiResource = CloneWithScopesExcept(resultApiResource, apiResourceScope);
-                    }
-                    else if (identityScopeNames.Contains(apiResourceScope.Name))
-                    {
-                        resultApiResource = CloneWithScopesExcept(resultApiResource, apiResourceScope);
-                        logger.LogError($"Duplicate Identity scope name found: '{apiResource.Name}', it is used by another API scope. This is an invalid configuration. Use different names for Identity and API scopes.");
+                        if (identityScopeNames.Contains(apiResourceScope.Name))
+                        {
+                            resultApiResource = CloneWithScopesExcept(resultApiResource, apiResourceScope);
+                            logger.LogError($"Duplicate Identity scope name found: '{apiResource.Name}', it is used by another API scope. This is an invalid configuration. Use different names for Identity and API scopes.");
+                        }
                     }
                     else
                     {
-                        allApiScopeNamesSoFar.Add(apiResourceScope.Name);
+                        logger.LogError($"Duplicate Identity scope found: '{apiResource.Name}'. This is an invalid configuration. Use different names for Identity scopes.");
+                        resultApiResource = CloneWithScopesExcept(resultApiResource, apiResourceScope);
                     }
                 }
                 yield return resultApiResource;
@@ -66,22 +65,20 @@ namespace Contrib.IdentityServer4.KubernetesStore
 
         internal static IEnumerable<IdentityResource> EnsureUniqueIndentityScopeNames(IEnumerable<IdentityResource> identityResources, ILogger logger, IEnumerable<ApiResource> apiResources)
         {
-            var allIdentityScopeNamesSoFar = new List<string>();
-            var apiScopeNames = apiResources.SelectMany(r => r.Scopes.Select(s => s.Name)).ToList();
+            var allIdentityScopeNamesSoFar = new HashSet<string>();
+            var apiScopeNames = new HashSet<string>(apiResources.SelectMany(r => r.Scopes.Select(s => s.Name)));
             foreach (var identityResource in identityResources)
             {
-                if (allIdentityScopeNamesSoFar.Contains(identityResource.Name))
+                if (allIdentityScopeNamesSoFar.Add(identityResource.Name))
                 {
-                    logger.LogError($"Duplicate Identity scope found: '{identityResource.Name}'. This is an invalid configuration. Use different names for Identity scopes.");
-                }
-                else if (apiScopeNames.Contains(identityResource.Name))
-                {
-                    logger.LogError($"Duplicate Identity scope name found: '{identityResource.Name}', it is used by another API scope. This is an invalid configuration. Use different names for Identity and API scopes.");
+                    if (apiScopeNames.Contains(identityResource.Name))
+                        logger.LogError($"Duplicate Identity scope name found: '{identityResource.Name}', it is used by another API scope. This is an invalid configuration. Use different names for Identity and API scopes.");
+                    else
+                        yield return identityResource;
                 }
                 else
                 {
-                    allIdentityScopeNamesSoFar.Add(identityResource.Name);
-                    yield return identityResource;
+                    logger.LogError($"Duplicate Identity scope found: '{identityResource.Name}'. This is an invalid configuration. Use different names for Identity scopes.");
                 }
             }
         }
