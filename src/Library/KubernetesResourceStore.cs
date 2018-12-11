@@ -1,17 +1,18 @@
+using Contrib.KubeClient.CustomResources;
+using IdentityServer4.Models;
+using Microsoft.Extensions.Logging;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
-using Contrib.KubeClient.CustomResources;
-using IdentityServer4.Models;
-using IdentityServer4.Stores;
 
 namespace Contrib.IdentityServer4.KubernetesStore
 {
     [ExcludeFromCodeCoverage]
-    public class KubernetesResourceStore : InMemoryResourcesStore
+    public class KubernetesResourceStore : DuplicateScopeFilteringInMemoryResourcesStore
     {
-        public KubernetesResourceStore(ICustomResourceWatcher<IdentityResourceResource> identityResourceWatcher, ICustomResourceWatcher<ApiResourceResource> apiResourceWatcher, IEnumerable<IdentityResource> defaultIdentityResources = null)
-            : base(identityResourceWatcher.RawResources.Select(resource => resource.Spec).Concat(defaultIdentityResources), apiResourceWatcher.RawResources.Select(resource => resource.Spec))
-        {}
+        public KubernetesResourceStore(ILogger<KubernetesResourceStore> logger, ICustomResourceWatcher<IdentityResourceResource> identityResourceWatcher, ICustomResourceWatcher<ApiResourceResource> apiResourceWatcher, IEnumerable<IdentityResource> defaultIdentityResources = null)
+            : base(logger, identityResourceWatcher.RawResources.Select(resource => resource.Spec).Concat(defaultIdentityResources ?? Enumerable.Empty<IdentityResource>()), apiResourceWatcher.RawResources.Select(resource => resource.Spec))
+        { }
+
     }
 }
