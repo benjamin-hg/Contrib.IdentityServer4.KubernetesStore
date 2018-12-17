@@ -11,7 +11,7 @@ namespace Contrib.IdentityServer4.KubernetesStore
     public class KubernetesResourceStore : DuplicateScopeFilteringInMemoryResourcesStore
     {
         public KubernetesResourceStore(ILogger<KubernetesResourceStore> logger, ICustomResourceWatcher<IdentityResourceResource> identityResourceWatcher, ICustomResourceWatcher<ApiResourceResource> apiResourceWatcher, IEnumerable<IdentityResource> defaultIdentityResources = null)
-            : base(logger, identityResourceWatcher.RawResources.Select(resource => resource.Spec).Concat(defaultIdentityResources ?? Enumerable.Empty<IdentityResource>()), apiResourceWatcher.RawResources.Select(resource => resource.Spec))
+            : base(logger, identityResourceWatcher.Select(resource => resource.Spec).Concat(defaultIdentityResources ?? Enumerable.Empty<IdentityResource>()), apiResourceWatcher.Select(resource => resource.Spec))
         { }
 
     }

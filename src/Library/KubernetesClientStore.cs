@@ -9,7 +9,7 @@ namespace Contrib.IdentityServer4.KubernetesStore
     public class KubernetesClientStore : InMemoryClientStore
     {
         public KubernetesClientStore(ICustomResourceWatcher<ClientResource> clientWatcher)
-            : base(clientWatcher.RawResources.Select(resource => resource.Spec))
+            : base(clientWatcher.Select(resource => resource.Spec))
         {}
     }
 }

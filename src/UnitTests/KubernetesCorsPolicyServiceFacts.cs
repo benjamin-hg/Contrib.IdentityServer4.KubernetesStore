@@ -39,7 +39,7 @@ namespace Contrib.IdentityServer4.KubernetesStore
         {
             _loggerMock = new Mock<ILogger<KubernetesCorsPolicyService>>();
             _clientResourceWatcherMock = new Mock<ICustomResourceWatcher<ClientResource>>();
-            _clientResourceWatcherMock.Setup(x => x.RawResources).Returns(_clientResources);
+            _clientResourceWatcherMock.Setup(x => x.GetEnumerator()).Returns(() => _clientResources.GetEnumerator());
         }
 
         private KubernetesCorsPolicyService SubjectUnderTest => new KubernetesCorsPolicyService(_loggerMock.Object, _clientResourceWatcherMock.Object);
