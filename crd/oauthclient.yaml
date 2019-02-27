@@ -21,7 +21,6 @@ spec:
       properties:
         spec:
           required:
-            - clientId
             - clientName
             - allowedGrantTypes
           properties:
@@ -30,7 +29,7 @@ spec:
               description: Specifies if client is enabled. This defaults to true.
             clientId:
               type: string
-              description: Unique ID of the client.
+              description: Unique ID of the client. If not set, the resource namespace and name (joined with a hyphen) are used instead.
             clientSecrets:
               type: array
               description: Client secrets - only relevant for flows that require a secret.
