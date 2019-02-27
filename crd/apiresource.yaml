@@ -21,15 +21,13 @@ spec:
       properties:
         spec:
           type: object
-          required:
-            - name
           properties:
             enabled:
               type: boolean
               description: Indicates if this resource is enabled. This defaults to true.
             name:
               type: string
-              description: The unique name of the resource.
+              description: The unique name of the resource. If not set, the resource namespace and name (joined with a hyphen) are used instead.
             displayName:
               type: string
               description: Display name of the resource.
