@@ -12,12 +12,15 @@ namespace Contrib.IdentityServer4.KubernetesStore
     public class KubernetesCorsPolicyService : InMemoryCorsPolicyService
     {
         public KubernetesCorsPolicyService(ILogger<KubernetesCorsPolicyService> logger, ICustomResourceWatcher<ClientResource> clientWatcher)
-            : base(logger, clientWatcher.Select(client => EnsureWellFormedAllowedCorsOrigins(client, logger)))
+            : base(logger, clientWatcher.Select(resource => GetClient(resource, logger)))
         { }
 
-        private static Client EnsureWellFormedAllowedCorsOrigins(ClientResource clientResource, ILogger logger)
+        private static Client GetClient(ClientResource resource, ILogger logger)
         {
-            var client = clientResource.Spec;
+            var client = resource.Spec;
+            if (string.IsNullOrEmpty(client.ClientId))
+                client.ClientId = resource.Metadata.Namespace + "-" + resource.Metadata.Name;
+
             if (client.AllowedCorsOrigins.All(IsWellFormedUriString))
                 return client;
 
