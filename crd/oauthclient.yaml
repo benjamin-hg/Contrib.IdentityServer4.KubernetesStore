@@ -11,8 +11,8 @@ spec:
     singular: oauthclient
     kind: OauthClient
     shortNames:
-    - oac
-    - client
+      - oac
+      - client
   subresources:
     status: {}
   validation:
@@ -27,10 +27,13 @@ spec:
           properties:
             enabled:
               type: boolean
+              description: Specifies if client is enabled. This defaults to true.
             clientId:
               type: string
+              description: Unique ID of the client.
             clientSecrets:
               type: array
+              description: Client secrets - only relevant for flows that require a secret.
               items:
                 properties:
                   value:
@@ -44,49 +47,76 @@ spec:
                   type:
                     type: string
                 required:
-                - value
+                  - value
             accessTokenType:
               type: string
               enum:
-                - 'jwt'
-                - 'reference'
+                - jwt
+                - reference
+              description:  Specifies whether the access token is a reference token or a self contained JWT token. This defaults to 'jwt'.
             clientName:
               type: string
+              description:  Client display name (used for logging and consent screen).
             clientUri:
               type: string
+              pattern: ^[^{]*$
+              description: URI to further information about client (used on consent screen).
             logoUri:
               type: string
+              pattern: ^[^{]*$
+              description: URI to client logo (used on consent screen).
             requireConsent:
               type: boolean
+              description: Specifies whether a consent screen is required. This defaults to true.
             allowAccessTokensViaBrowser:
               type: boolean
+              description: Controls whether access tokens are transmitted via the browser for this client. This can prevent accidental leakage of access tokens when multiple response types are allowed.
             alwaysIncludeUserClaimsInIdToken:
               type: boolean
+              description: When requesting both an id token and access token, should the user claims always be added to the id token instead of requring the client to use the userinfo endpoint.
             allowedGrantTypes:
               type: array
+              description: Specifies the allowed grant types.
               items:
                 type: string
+                enum:
+                  - authorizationCode
+                  - implicit
+                  - hybrid
+                  - resourceOwner
+                  - clientCredentials
             redirectUris:
               type: array
+              description: Specifies allowed URIs to return tokens or authorization codes to
               items:
                 type: string
+                pattern: ^[^{]*$
             frontChannelLogoutUri:
               type: string
+              pattern: ^[^{]*$
+              description: Specifies logout URI at client for HTTP front-channel based logout.
             postLogoutRedirectUris:
               type: array
+              description: Specifies allowed URIs to redirect to after logout.
               items:
                 type: string
+                pattern: ^[^{]*$
             allowedScopes:
               type: array
+              description: Specifies the api scopes that the client is allowed to request. If empty, the client can't access any scope.
               items:
                 type: string
             updateAccessTokenClaimsOnRefresh:
               type: boolean
+              description: Gets or sets a value indicating whether the access token (and its claims) should be updated on a refresh token request.
             allowedCorsOrigins:
               type: array
+              description: Gets or sets the allowed CORS origins for JavaScript clients.
               items:
                 type: string
+                pattern: ^[^{]*$
             claims:
               type: array
+              description: Allows settings claims for the client (will be included in the access token).
               items:
                 type: string

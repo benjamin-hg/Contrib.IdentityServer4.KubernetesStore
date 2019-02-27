@@ -10,6 +10,7 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "crd", "crd", "{383C57F7-3011-4E49-A835-D5934859E0F3}"
 ProjectSection(SolutionItems) = preProject
 	..\crd\apiresource.yaml = ..\crd\apiresource.yaml
+	..\crd\identityresource.yaml = ..\crd\identityresource.yaml
 	..\crd\oauthclient.yaml = ..\crd\oauthclient.yaml
 EndProjectSection
 EndProject

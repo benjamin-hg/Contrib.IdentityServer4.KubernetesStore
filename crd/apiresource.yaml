@@ -11,8 +11,8 @@ spec:
     singular: apiresource
     kind: ApiResource
     shortNames:
-    - apr
-    - apires
+      - apr
+      - apires
   subresources:
     status: {}
   validation:
@@ -22,10 +22,28 @@ spec:
         spec:
           type: object
           required:
-          - name
+            - name
           properties:
+            enabled:
+              type: boolean
+              description: Indicates if this resource is enabled. This defaults to true.
+            name:
+              type: string
+              description: The unique name of the resource.
+            displayName:
+              type: string
+              description: Display name of the resource.
+            description:
+              type: string
+              description: Description of the resource.
+            userClaims:
+              type: array
+              description: List of accociated user claims that should be included when this resource is requested.
+              items:
+                type: string
             apiSecrets:
               type: array
+              description: The API secret is used for the introspection endpoint. The API can authenticate with introspection using the API name and secret.
               items:
                 type: object
                 properties:
@@ -41,36 +59,32 @@ spec:
                     type: string
             scopes:
               type: array
+              description: An API must have at least one scope. Each scope can have different settings.
               items:
                 type: object
                 required:
-                - name
+                  - name
                 properties:
                   name:
                     type: string
+                    description: Name of the scope. This is the value a client will use to request the scope.
                   displayName:
                     type: string
+                    description:  This value will be used e.g. on the consent screen.
                   description:
                     type: string
+                    description: This value will be used e.g. on the consent screen.
                   required:
                     type: boolean
+                    description: Specifies whether the user can de-select the scope on the consent screen.
                   emphasize:
                     type: boolean
+                    description: Specifies whether the consent screen will emphasize this scope. Use this setting for sensitive or important scopes.
                   showInDiscoveryDocument:
                     type: boolean
+                    description: Specifies whether this scope is shown in the discovery document. This defaults to true.
                   userClaims:
                     type: array
+                    description: List of user-claim types that should be included in the access token.
                     items:
                       type: string
-            enabled:
-              type: boolean
-            name:
-              type: string
-            displayName:
-              type: string
-            description:
-              type: string
-            userClaims:
-              type: array
-              items:
-                type: string
