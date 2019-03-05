@@ -1,0 +1,260 @@
+apiVersion: apiextensions.k8s.io/v1beta1
+kind: CustomResourceDefinition
+metadata:
+  name: oauthclients.contrib.identityserver.io
+spec:
+  group: contrib.identityserver.io
+  version: v1
+  scope: Namespaced
+  names:
+    plural: oauthclients
+    singular: oauthclient
+    kind: OauthClient
+    shortNames:
+      - oac
+      - client
+  subresources:
+    status: {}
+  validation:
+    openAPIV3Schema:
+      required: ['spec']
+      properties:
+        spec:
+          required:
+            - clientName
+            - allowedGrantTypes
+          properties:
+            enabled:
+              type: boolean
+              description: Specifies if client is enabled. This defaults to true.
+            clientId:
+              type: string
+              description: Unique ID of the client. If not set, the resource namespace and name (joined with a hyphen) are used instead.
+            clientSecrets:
+              type: array
+              description: Client secrets - only relevant for flows that require a secret.
+              items:
+                properties:
+                  value:
+                    type: string
+                    format: password
+                  description:
+                    type: string
+                  expiration:
+                    type: string
+                    format: date-time
+                  type:
+                    type: string
+                required:
+                  - value
+            accessTokenType:
+              type: string
+              enum:
+                - jwt
+                - reference
+              description:  Specifies whether the access token is a reference token or a self contained JWT token. This defaults to 'jwt'.
+            clientName:
+              type: string
+              description:  Client display name (used for logging and consent screen).
+            clientUri:
+              type: string
+              pattern: ^[^{]*$
+              description: URI to further information about client (used on consent screen).
+            logoUri:
+              type: string
+              pattern: ^[^{]*$
+              description: URI to client logo (used on consent screen).
+            requireConsent:
+              type: boolean
+              description: Specifies whether a consent screen is required. This defaults to true.
+            allowAccessTokensViaBrowser:
+              type: boolean
+              description: Controls whether access tokens are transmitted via the browser for this client. This can prevent accidental leakage of access tokens when multiple response types are allowed.
+            alwaysIncludeUserClaimsInIdToken:
+              type: boolean
+              description: When requesting both an id token and access token, should the user claims always be added to the id token instead of requring the client to use the userinfo endpoint.
+            allowedGrantTypes:
+              type: array
+              description: Specifies the allowed grant types.
+              items:
+                type: string
+                enum:
+                  - authorizationCode
+                  - implicit
+                  - hybrid
+                  - resourceOwner
+                  - clientCredentials
+            redirectUris:
+              type: array
+              description: Specifies allowed URIs to return tokens or authorization codes to
+              items:
+                type: string
+                pattern: ^[^{]*$
+            frontChannelLogoutUri:
+              type: string
+              pattern: ^[^{]*$
+              description: Specifies logout URI at client for HTTP front-channel based logout.
+            postLogoutRedirectUris:
+              type: array
+              description: Specifies allowed URIs to redirect to after logout.
+              items:
+                type: string
+                pattern: ^[^{]*$
+            allowedScopes:
+              type: array
+              description: Specifies the api scopes that the client is allowed to request. If empty, the client can't access any scope.
+              items:
+                type: string
+            updateAccessTokenClaimsOnRefresh:
+              type: boolean
+              description: Gets or sets a value indicating whether the access token (and its claims) should be updated on a refresh token request.
+            allowedCorsOrigins:
+              type: array
+              description: Gets or sets the allowed CORS origins for JavaScript clients.
+              items:
+                type: string
+                pattern: ^[^{]*$
+            claims:
+              type: array
+              description: Allows settings claims for the client (will be included in the access token).
+              items:
+                type: string
+---
+apiVersion: apiextensions.k8s.io/v1beta1
+kind: CustomResourceDefinition
+metadata:
+  name: apiresources.contrib.identityserver.io
+spec:
+  group: contrib.identityserver.io
+  version: v1
+  scope: Namespaced
+  names:
+    plural: apiresources
+    singular: apiresource
+    kind: ApiResource
+    shortNames:
+      - apr
+      - apires
+  subresources:
+    status: {}
+  validation:
+    openAPIV3Schema:
+      required: ['spec']
+      properties:
+        spec:
+          type: object
+          properties:
+            enabled:
+              type: boolean
+              description: Indicates if this resource is enabled. This defaults to true.
+            name:
+              type: string
+              description: The unique name of the resource. If not set, the resource namespace and name (joined with a hyphen) are used instead.
+            displayName:
+              type: string
+              description: Display name of the resource.
+            description:
+              type: string
+              description: Description of the resource.
+            userClaims:
+              type: array
+              description: List of accociated user claims that should be included when this resource is requested.
+              items:
+                type: string
+            apiSecrets:
+              type: array
+              description: The API secret is used for the introspection endpoint. The API can authenticate with introspection using the API name and secret.
+              items:
+                type: object
+                properties:
+                  description:
+                    type: string
+                  value:
+                    type: string
+                    format: password
+                  expiration:
+                    format: date-time
+                    type: string
+                  type:
+                    type: string
+            scopes:
+              type: array
+              description: An API must have at least one scope. Each scope can have different settings.
+              items:
+                type: object
+                required:
+                  - name
+                properties:
+                  name:
+                    type: string
+                    description: Name of the scope. This is the value a client will use to request the scope.
+                  displayName:
+                    type: string
+                    description:  This value will be used e.g. on the consent screen.
+                  description:
+                    type: string
+                    description: This value will be used e.g. on the consent screen.
+                  required:
+                    type: boolean
+                    description: Specifies whether the user can de-select the scope on the consent screen.
+                  emphasize:
+                    type: boolean
+                    description: Specifies whether the consent screen will emphasize this scope. Use this setting for sensitive or important scopes.
+                  showInDiscoveryDocument:
+                    type: boolean
+                    description: Specifies whether this scope is shown in the discovery document. This defaults to true.
+                  userClaims:
+                    type: array
+                    description: List of user-claim types that should be included in the access token.
+                    items:
+                      type: string
+---
+apiVersion: apiextensions.k8s.io/v1beta1
+kind: CustomResourceDefinition
+metadata:
+  name: identityresources.contrib.identityserver.io
+spec:
+  group: contrib.identityserver.io
+  version: v1
+  scope: Namespaced
+  names:
+    plural: identityresources
+    singular: identityresource
+    kind: IdentityResource
+    shortNames:
+      - idr
+  subresources:
+    status: {}
+  validation:
+    openAPIV3Schema:
+      required: ['spec']
+      properties:
+        spec:
+          type: object
+          properties:
+            enabled:
+              type: boolean
+              description: Indicates if this resource is enabled. This defaults to true.
+            name:
+              type: string
+              description: The unique name of the resource. If not set, the resource namespace and name (joined with a hyphen) are used instead.
+            displayName:
+              type: string
+              description: Display name of the resource.
+            description:
+              type: string
+              description: Description of the resource.
+            userClaims:
+              type: array
+              description: List of accociated user claims that should be included when this resource is requested.
+              items:
+                type: string
+            required:
+              type: boolean
+              description: Specifies whether the user can de-select the scope on the consent screen (if the consent screen wants to implement such a feature).
+            emphasize:
+              type: boolean
+              description: Specifies whether the consent screen will emphasize this scope (if the consent screen wants to implement such a feature). Use this setting for sensitive or important scopes.
+            showInDiscoveryDocument:
+              type: boolean
+              description: Specifies whether this scope is shown in the discovery document. This defaults to true.

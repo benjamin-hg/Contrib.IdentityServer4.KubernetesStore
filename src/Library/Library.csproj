@@ -18,7 +18,7 @@
   <PropertyGroup>
     <Authors>AXOOM GmbH</Authors>
     <Copyright>Copyright (c) AXOOM GmbH</Copyright>
-    <Description>Provides custom stores for IdentityServer4 that fetch Clients, API Resources, etc. from Kubernetes Resources.</Description>
+    <Description>Allows IdentityServer4 to fetch Clients, API Resources, etc. from Kubernetes Custom Resources rather than a database.</Description>
     <PackageProjectUrl>https://github.com/AXOOM/Contrib.IdentityServer4.KubernetesStore</PackageProjectUrl>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <PackageTags>Kubernetes;IdentityServer4;CustomResources</PackageTags>
