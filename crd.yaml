@@ -79,11 +79,12 @@ spec:
               items:
                 type: string
                 enum:
-                  - authorizationCode
                   - implicit
                   - hybrid
-                  - resourceOwner
-                  - clientCredentials
+                  - authorization_code
+                  - client_credentials
+                  - password
+                  - urn:ietf:params:oauth:grant-type:device_code
             redirectUris:
               type: array
               description: Specifies allowed URIs to return tokens or authorization codes to
