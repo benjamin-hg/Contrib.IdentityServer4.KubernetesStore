@@ -25,9 +25,9 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="CompareNETObjects" Version="4.57.0" />
+    <PackageReference Include="CompareNETObjects" Version="4.58.0" />
     <PackageReference Include="IdentityServer4" Version="2.3.2" />
-    <PackageReference Include="Contrib.KubeClient.CustomResources" Version="0.13.0" />
+    <PackageReference Include="Contrib.KubeClient.CustomResources" Version="0.13.2" />
     <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.0.0-beta-63127-02" PrivateAssets="All" />
   </ItemGroup>
 
