@@ -7,7 +7,8 @@ namespace Contrib.IdentityServer4.KubernetesStore
 {
     public class IdentityResourceResource : CustomResource<IdentityResource>, IPayloadPatchable<IdentityResourceResource>
     {
-        public new static CustomResourceDefinition Definition { get; } = Crd.For(pluralName: "identityresources", kind: "IdentityResource");
+        public new static CustomResourceDefinition Definition { get; }
+            = new CustomResourceDefinition("contrib.identityserver.io/v1", "identityresources", "IdentityResource");
 
         public IdentityResourceResource()
             : base(Definition)
