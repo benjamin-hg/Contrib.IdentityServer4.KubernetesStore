@@ -8,7 +8,10 @@ namespace Contrib.IdentityServer4.KubernetesStore
     public class ClientResource : CustomResource<Client>, IPayloadPatchable<ClientResource>
     {
         public new static CustomResourceDefinition Definition { get; }
-            = new CustomResourceDefinition("contrib.identityserver.io/v1", "oauthclients", "OauthClient");
+            = new CustomResourceDefinition("contrib.identityserver.io/v1", "oauthclients", "OauthClient")
+            {
+                SerializerSettings = {Converters = {new ClaimConverter()}}
+            };
 
         public ClientResource()
             : base(Definition)
